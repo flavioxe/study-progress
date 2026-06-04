@@ -610,6 +610,30 @@ let state = {}; // { "ti:0": {status: "0", note: ""}, ... }
 let activeTab = "ti";
 let statusFilter = "all";
 let saveTimeout = null;
+const STORAGE_KEY = "bb_tracker_v2";
+
+const storageAdapter = {
+  async get(keyName) {
+    if (window.storage && typeof window.storage.get === "function") {
+      return window.storage.get(keyName);
+    }
+
+    try {
+      const value = window.localStorage.getItem(keyName);
+      return { value };
+    } catch (error) {
+      return { value: null };
+    }
+  },
+  async set(keyName, value) {
+    if (window.storage && typeof window.storage.set === "function") {
+      return window.storage.set(keyName, value);
+    }
+
+    window.localStorage.setItem(keyName, value);
+    return true;
+  }
+};
 
 function key(discId, topicIdx) { return `${discId}:${topicIdx}`; }
 
@@ -628,7 +652,7 @@ function setState(discId, idx, field, val) {
 
 async function loadState() {
   try {
-    const r = await window.storage.get("bb_tracker_v2");
+    const r = await storageAdapter.get(STORAGE_KEY);
     if (r && r.value) state = JSON.parse(r.value);
   } catch(e) { state = {}; }
 }
@@ -639,7 +663,7 @@ function scheduleSave() {
   if (ind) { ind.className = "save-indicator"; ind.querySelector("span").textContent = "Salvando..."; }
   saveTimeout = setTimeout(async () => {
     try {
-      await window.storage.set("bb_tracker_v2", JSON.stringify(state));
+      await storageAdapter.set(STORAGE_KEY, JSON.stringify(state));
       if (ind) { ind.className = "save-indicator saved"; ind.querySelector("span").textContent = "Dados salvos ✓"; }
     } catch(e) {
       if (ind) { ind.querySelector("span").textContent = "Erro ao salvar"; }
