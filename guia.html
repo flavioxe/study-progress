@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guia de Estudos | BB Agente de TI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #161a24;
+      --border: #2a3048;
+      --text: #e8eaf0;
+      --muted: #94a3b8;
+      --accent: #4f8ef7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: radial-gradient(circle at top, rgba(79,142,247,0.12), transparent 30%), var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.7;
+    }
+
+    .shell {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding: 16px 18px;
+      background: rgba(22,26,36,0.85);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      position: sticky;
+      top: 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .title {
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 1px;
+      font-size: 13px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .back {
+      color: white;
+      background: var(--accent);
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .content {
+      background: rgba(22,26,36,0.8);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.2;
+      margin-top: 1.5em;
+      margin-bottom: 0.6em;
+    }
+
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; color: #dbeafe; }
+    h3 { font-size: 1.15rem; color: #bfdbfe; }
+    p, li { color: var(--text); }
+    ul { padding-left: 22px; }
+    code { font-family: 'Space Mono', monospace; color: #93c5fd; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: rgba(79,142,247,0.12); }
+    blockquote { margin: 18px 0; padding: 14px 16px; border-left: 4px solid var(--accent); background: rgba(79,142,247,0.08); color: #dbeafe; }
+    .muted { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <div class="title">Guia Completo</div>
+        <div class="muted">Conteúdo carregado do arquivo de guia do projeto</div>
+      </div>
+      <a class="back" href="/bb_agente_ti_tracker.html">Voltar ao tracker</a>
+    </div>
+    <article class="content" id="content">Carregando guia...</article>
+  </div>
+
+  <script>
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function inlineMarkdown(text) {
+      return text
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    }
+
+    function parseTable(lines, start) {
+      const tableLines = [];
+      let index = start;
+      while (index < lines.length && /^\|.*\|$/.test(lines[index].trim())) {
+        tableLines.push(lines[index].trim());
+        index += 1;
+      }
+
+      if (tableLines.length < 2) {
+        return null;
+      }
+
+      const rows = tableLines
+        .filter((line, idx) => !(idx === 1 && /^\|?\s*[-:| ]+\|\s*$/.test(line)))
+        .map((line) => line.slice(1, -1).split('|').map((cell) => inlineMarkdown(escapeHtml(cell.trim()))));
+
+      const header = rows.shift() || [];
+      const thead = `<thead><tr>${header.map((cell) => `<th>${cell}</th>`).join('')}</tr></thead>`;
+      const tbody = `<tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>`;
+      return { html: `<table>${thead}${tbody}</table>`, nextIndex: index };
+    }
+
+    function markdownToHtml(markdown) {
+      const lines = markdown.replace(/\r/g, '').split('\n');
+      const html = [];
+      let inList = false;
+
+      for (let i = 0; i < lines.length; i += 1) {
+        const rawLine = lines[i];
+        const line = rawLine.trim();
+
+        if (!line) {
+          if (inList) {
+            html.push('</ul>');
+            inList = false;
+          }
+          continue;
+        }
+
+        const table = parseTable(lines, i);
+        if (table) {
+          if (inList) {
+            html.push('</ul>');
+            inList = false;
+          }
+          html.push(table.html);
+          i = table.nextIndex - 1;
+          continue;
+        }
+
+        if (line === '---') {
+          if (inList) {
+            html.push('</ul>');
+            inList = false;
+          }
+          html.push('<hr>');
+          continue;
+        }
+
+        if (line.startsWith('### ')) {
+          if (inList) {
+            html.push('</ul>');
+            inList = false;
+          }
+          html.push(`<h3>${inlineMarkdown(escapeHtml(line.slice(4)))}</h3>`);
+          continue;
+        }
+
+        if (line.startsWith('## ')) {
+          if (inList) {
+            html.push('</ul>');
+            inList = false;
+          }
+          html.push(`<h2>${inlineMarkdown(escapeHtml(line.slice(3)))}</h2>`);
+          continue;
+        }
+
+        if (line.startsWith('# ')) {
+          if (inList) {
+            html.push('</ul>');
+            inList = false;
+          }
+          html.push(`<h1>${inlineMarkdown(escapeHtml(line.slice(2)))}</h1>`);
+          continue;
+        }
+
+        if (line.startsWith('> ')) {
+          if (inList) {
+            html.push('</ul>');
+            inList = false;
+          }
+          html.push(`<blockquote>${inlineMarkdown(escapeHtml(line.slice(2)))}</blockquote>`);
+          continue;
+        }
+
+        if (/^[-*] /.test(line) || /^\d+\. /.test(line)) {
+          if (!inList) {
+            html.push('<ul>');
+            inList = true;
+          }
+          html.push(`<li>${inlineMarkdown(escapeHtml(line.replace(/^[-*] /, '').replace(/^\d+\. /, '')))}</li>`);
+          continue;
+        }
+
+        if (inList) {
+          html.push('</ul>');
+          inList = false;
+        }
+
+        html.push(`<p>${inlineMarkdown(escapeHtml(line))}</p>`);
+      }
+
+      if (inList) {
+        html.push('</ul>');
+      }
+
+      return html.join('');
+    }
+
+    fetch('/guia-completo-bb-agente-ti.md')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Nao foi possivel carregar o guia');
+        }
+        return response.text();
+      })
+      .then((markdown) => {
+        document.getElementById('content').innerHTML = markdownToHtml(markdown);
+      })
+      .catch((error) => {
+        document.getElementById('content').innerHTML = `<p>Erro ao carregar o guia.</p><p class="muted">${error.message}</p>`;
+      });
+  </script>
+</body>
+</html>

@@ -350,6 +350,9 @@
     <div style="font-size:11px;color:var(--text-muted);">Tracker de Estudos · CESGRANRIO</div>
   </div>
   <h1>Controle de <span>Progresso</span></h1>
+  <div class="filter-row" style="margin-bottom:0;">
+    <a class="filter-btn active" href="/guia.html" style="text-decoration:none;display:inline-flex;align-items:center;">Abrir guia completo</a>
+  </div>
 </header>
 
 <div class="stats-grid" id="stats-grid"></div>
@@ -382,7 +385,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getAuth, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { doc, getDoc, getFirestore, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -399,6 +402,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
 
 const DISCIPLINES = [
   {
@@ -707,7 +711,22 @@ function renderAuthBar() {
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
-      updateSaveIndicator("Falha no login com Google");
+      if (error && (error.code === "auth/popup-blocked" || error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request")) {
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          return;
+        } catch (redirectError) {
+          updateSaveIndicator("Falha no login: verifique domínio autorizado no Firebase");
+          return;
+        }
+      }
+
+      if (error && error.code === "auth/unauthorized-domain") {
+        updateSaveIndicator("Domínio não autorizado no Firebase Auth");
+        return;
+      }
+
+      updateSaveIndicator(`Falha no login: ${error.code || "erro-desconhecido"}`);
     }
   };
 }
@@ -911,6 +930,16 @@ onAuthStateChanged(auth, async (user) => {
   renderTabs();
   renderContent();
   updateSaveIndicator(remoteEnabled && currentUser ? "Dados sincronizados com Firebase" : "Modo local ativo");
+});
+
+getRedirectResult(auth).catch((error) => {
+  if (error && error.code === "auth/unauthorized-domain") {
+    updateSaveIndicator("Adicione o domínio da Vercel em Authorized domains no Firebase");
+    return;
+  }
+  if (error) {
+    updateSaveIndicator(`Erro no retorno do login: ${error.code || "erro-desconhecido"}`);
+  }
 });
 
 init();
