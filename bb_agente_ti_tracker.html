@@ -676,6 +676,17 @@ function updateSaveIndicator(message, isSaved = false) {
   ind.querySelector("span").textContent = message;
 }
 
+function describeAuthError(error) {
+  if (!error || !error.code) return "erro-desconhecido";
+  if (error.code === "auth/unauthorized-domain") return "dominio-nao-autorizado";
+  if (error.code === "auth/operation-not-allowed") return "google-auth-nao-habilitado";
+  if (error.code === "auth/popup-blocked") return "popup-bloqueado";
+  if (error.code === "auth/popup-closed-by-user") return "popup-fechado";
+  if (error.code === "auth/cancelled-popup-request") return "popup-cancelado";
+  if (error.code === "permission-denied") return "firestore-sem-permissao";
+  return error.code;
+}
+
 function renderAuthBar() {
   let authBar = document.getElementById("auth-bar");
   if (!authBar) {
@@ -709,14 +720,14 @@ function renderAuthBar() {
   `;
   document.getElementById("login-btn").onclick = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      await signInWithRedirect(auth, googleProvider);
     } catch (error) {
       if (error && (error.code === "auth/popup-blocked" || error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request")) {
         try {
-          await signInWithRedirect(auth, googleProvider);
+          await signInWithPopup(auth, googleProvider);
           return;
         } catch (redirectError) {
-          updateSaveIndicator("Falha no login: verifique domínio autorizado no Firebase");
+          updateSaveIndicator(`Falha no login: ${describeAuthError(redirectError)}`);
           return;
         }
       }
@@ -726,7 +737,7 @@ function renderAuthBar() {
         return;
       }
 
-      updateSaveIndicator(`Falha no login: ${error.code || "erro-desconhecido"}`);
+      updateSaveIndicator(`Falha no login: ${describeAuthError(error)}`);
     }
   };
 }
@@ -750,7 +761,10 @@ async function loadState() {
   try {
     const r = await storageAdapter.get(STORAGE_KEY);
     if (r && r.value) state = JSON.parse(r.value);
-  } catch(e) { state = {}; }
+  } catch(e) {
+    state = {};
+    updateSaveIndicator(`Falha ao carregar dados: ${describeAuthError(e)}`);
+  }
 }
 
 function scheduleSave() {
@@ -938,7 +952,7 @@ getRedirectResult(auth).catch((error) => {
     return;
   }
   if (error) {
-    updateSaveIndicator(`Erro no retorno do login: ${error.code || "erro-desconhecido"}`);
+    updateSaveIndicator(`Erro no retorno do login: ${describeAuthError(error)}`);
   }
 });
 
