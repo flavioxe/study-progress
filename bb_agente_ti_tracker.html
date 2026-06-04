@@ -3,6 +3,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
@@ -42,6 +43,12 @@
     color: var(--text);
     min-height: 100vh;
     padding: 16px;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
   }
 
   header {
@@ -219,6 +226,12 @@
     margin-bottom: 20px;
   }
 
+  .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 10px;
+  }
+
   .topics-table th {
     text-align: left;
     padding: 8px 12px;
@@ -340,9 +353,95 @@
   }
 
   .empty { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
+
+  .auth-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-left: auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .auth-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 8px;
+    min-width: 180px;
+    font-size: 13px;
+    outline: none;
+  }
+
+  .auth-input:focus {
+    border-color: var(--accent);
+  }
+
+  @media (max-width: 900px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .disc-header {
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .disc-meta {
+      margin-left: 0;
+      width: 100%;
+    }
+
+    .disc-progress {
+      max-width: none;
+      width: 100%;
+      order: 4;
+    }
+
+    .topics-table {
+      min-width: 720px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    body {
+      padding: 12px;
+    }
+
+    h1 {
+      font-size: 20px;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tab {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .auth-form {
+      width: 100%;
+      margin-left: 0;
+      justify-content: stretch;
+    }
+
+    .auth-input,
+    .auth-form .filter-btn {
+      width: 100%;
+    }
+
+    .filter-row {
+      gap: 6px;
+    }
+  }
 </style>
 </head>
 <body>
+
+<div class="app-shell">
 
 <header>
   <div class="logo-row">
@@ -383,9 +482,11 @@
   <span>Dados salvos automaticamente</span>
 </div>
 
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getAuth, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { doc, getDoc, getFirestore, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -401,8 +502,6 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
-const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: "select_account" });
 
 const DISCIPLINES = [
   {
@@ -678,11 +777,12 @@ function updateSaveIndicator(message, isSaved = false) {
 
 function describeAuthError(error) {
   if (!error || !error.code) return "erro-desconhecido";
-  if (error.code === "auth/unauthorized-domain") return "dominio-nao-autorizado";
-  if (error.code === "auth/operation-not-allowed") return "google-auth-nao-habilitado";
-  if (error.code === "auth/popup-blocked") return "popup-bloqueado";
-  if (error.code === "auth/popup-closed-by-user") return "popup-fechado";
-  if (error.code === "auth/cancelled-popup-request") return "popup-cancelado";
+  if (error.code === "auth/operation-not-allowed") return "email-senha-nao-habilitado";
+  if (error.code === "auth/invalid-credential") return "email-ou-senha-invalidos";
+  if (error.code === "auth/invalid-email") return "email-invalido";
+  if (error.code === "auth/missing-password") return "senha-obrigatoria";
+  if (error.code === "auth/weak-password") return "senha-fraca";
+  if (error.code === "auth/email-already-in-use") return "email-ja-cadastrado";
   if (error.code === "permission-denied") return "firestore-sem-permissao";
   return error.code;
 }
@@ -714,30 +814,40 @@ function renderAuthBar() {
   }
 
   authBar.innerHTML = `
-    <div class="disc-title">Salvar na nuvem</div>
-    <div class="disc-meta">Entre com Google para sincronizar entre dispositivos</div>
-    <button class="filter-btn active" id="login-btn">Entrar com Google</button>
+    <div>
+      <div class="disc-title">Login pessoal</div>
+      <div class="disc-meta">Use email e senha para salvar na nuvem</div>
+    </div>
+    <div class="auth-form">
+      <input class="auth-input" id="email-input" type="email" placeholder="Seu email" />
+      <input class="auth-input" id="password-input" type="password" placeholder="Sua senha" />
+      <button class="filter-btn active" id="login-btn">Entrar</button>
+      <button class="filter-btn" id="register-btn">Criar acesso</button>
+    </div>
   `;
+
+  const getCredentials = () => ({
+    email: document.getElementById("email-input").value.trim(),
+    password: document.getElementById("password-input").value
+  });
+
   document.getElementById("login-btn").onclick = async () => {
     try {
-      await signInWithRedirect(auth, googleProvider);
+      const { email, password } = getCredentials();
+      await signInWithEmailAndPassword(auth, email, password);
+      updateSaveIndicator("Login realizado com sucesso", true);
     } catch (error) {
-      if (error && (error.code === "auth/popup-blocked" || error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request")) {
-        try {
-          await signInWithPopup(auth, googleProvider);
-          return;
-        } catch (redirectError) {
-          updateSaveIndicator(`Falha no login: ${describeAuthError(redirectError)}`);
-          return;
-        }
-      }
-
-      if (error && error.code === "auth/unauthorized-domain") {
-        updateSaveIndicator("Domínio não autorizado no Firebase Auth");
-        return;
-      }
-
       updateSaveIndicator(`Falha no login: ${describeAuthError(error)}`);
+    }
+  };
+
+  document.getElementById("register-btn").onclick = async () => {
+    try {
+      const { email, password } = getCredentials();
+      await createUserWithEmailAndPassword(auth, email, password);
+      updateSaveIndicator("Acesso criado com sucesso", true);
+    } catch (error) {
+      updateSaveIndicator(`Falha ao criar acesso: ${describeAuthError(error)}`);
     }
   };
 }
@@ -845,12 +955,17 @@ function renderDiscHeader(discId) {
 }
 
 function renderTabs() {
+  const tabLabels = {
+    portugues: "Português",
+    ingles: "Inglês"
+  };
+
   document.getElementById("tabs").innerHTML = DISCIPLINES.map(d => {
     const counts = countByStatus(d.id);
     const done = (counts["2"] || 0) + (counts["4"] || 0);
     return `<button class="tab ${d.id === activeTab ? 'active' : ''}" onclick="setTab('${d.id}')">
       <span style="width:8px;height:8px;border-radius:50%;background:${d.color};display:inline-block"></span>
-      ${d.name.split(' ')[0]}${d.name.split(' ').length > 2 ? '...' : ''}
+      ${tabLabels[d.id] || d.name.split(' ')[0] + (d.name.split(' ').length > 2 ? '...' : '')}
       <span class="badge">${done}/${d.topics.length}</span>
     </button>`;
   }).join("");
@@ -913,7 +1028,7 @@ function renderContent() {
     </div>
     ${filteredTopics.length === 0 
       ? '<div class="empty">Nenhum tópico com esse status nessa disciplina.</div>'
-      : `<table class="topics-table">
+      : `<div class="table-wrap"><table class="topics-table">
           <thead><tr>
             <th>#</th>
             <th>Tópico</th>
@@ -921,7 +1036,7 @@ function renderContent() {
             <th>Anotações</th>
           </tr></thead>
           <tbody>${rows}</tbody>
-        </table>`
+        </table></div>`
     }
   `;
 }
@@ -944,16 +1059,6 @@ onAuthStateChanged(auth, async (user) => {
   renderTabs();
   renderContent();
   updateSaveIndicator(remoteEnabled && currentUser ? "Dados sincronizados com Firebase" : "Modo local ativo");
-});
-
-getRedirectResult(auth).catch((error) => {
-  if (error && error.code === "auth/unauthorized-domain") {
-    updateSaveIndicator("Adicione o domínio da Vercel em Authorized domains no Firebase");
-    return;
-  }
-  if (error) {
-    updateSaveIndicator(`Erro no retorno do login: ${describeAuthError(error)}`);
-  }
 });
 
 init();
