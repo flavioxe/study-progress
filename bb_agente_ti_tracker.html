@@ -486,7 +486,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { browserLocalPersistence, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, setPersistence, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { doc, getDoc, getFirestore, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -737,24 +737,60 @@ let currentUser = null;
 let authReady = false;
 let remoteEnabled = false;
 
+function getLocalStateValue(keyName) {
+  try {
+    return window.localStorage.getItem(keyName);
+  } catch (error) {
+    return null;
+  }
+}
+
+function setLocalStateValue(keyName, value) {
+  try {
+    window.localStorage.setItem(keyName, value);
+  } catch (error) {
+    // Sem armazenamento local disponível; o Firestore segue como fonte principal.
+  }
+}
+
+function hasStoredProgress(rawValue) {
+  if (!rawValue) return false;
+  try {
+    const parsed = JSON.parse(rawValue);
+    return Boolean(parsed && Object.keys(parsed).length);
+  } catch (error) {
+    return false;
+  }
+}
+
 const storageAdapter = {
   async get(keyName) {
+    const localValue = getLocalStateValue(keyName);
+
     if (remoteEnabled && currentUser) {
       const snapshot = await getDoc(doc(db, "studyProgress", currentUser.uid));
       if (snapshot.exists()) {
         const data = snapshot.data();
-        return { value: JSON.stringify(data.state || {}) };
+        const remoteValue = JSON.stringify(data.state || {});
+        setLocalStateValue(keyName, remoteValue);
+        return { value: remoteValue, source: "remote" };
+      }
+
+      if (hasStoredProgress(localValue)) {
+        await setDoc(doc(db, "studyProgress", currentUser.uid), {
+          state: JSON.parse(localValue),
+          updatedAt: new Date().toISOString(),
+          email: currentUser.email || null
+        }, { merge: true });
+        return { value: localValue, source: "local-migrated" };
       }
     }
 
-    try {
-      const value = window.localStorage.getItem(keyName);
-      return { value };
-    } catch (error) {
-      return { value: null };
-    }
+    return { value: localValue, source: "local" };
   },
   async set(keyName, value) {
+    setLocalStateValue(keyName, value);
+
     if (remoteEnabled && currentUser) {
       await setDoc(doc(db, "studyProgress", currentUser.uid), {
         state: JSON.parse(value),
@@ -763,7 +799,6 @@ const storageAdapter = {
       }, { merge: true });
     }
 
-    window.localStorage.setItem(keyName, value);
     return true;
   }
 };
@@ -874,7 +909,7 @@ function setState(discId, idx, field, val) {
 async function loadState() {
   try {
     const r = await storageAdapter.get(STORAGE_KEY);
-    if (r && r.value) state = JSON.parse(r.value);
+    state = r && r.value ? JSON.parse(r.value) : {};
   } catch(e) {
     state = {};
     updateSaveIndicator(`Falha ao carregar dados: ${describeAuthError(e)}`);
@@ -1046,6 +1081,7 @@ function renderContent() {
 }
 
 async function init() {
+  await setPersistence(auth, browserLocalPersistence);
   renderAuthBar();
   await loadState();
   renderStats();
