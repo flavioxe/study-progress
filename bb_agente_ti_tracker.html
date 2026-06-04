@@ -380,7 +380,26 @@
   <span>Dados salvos automaticamente</span>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { doc, getDoc, getFirestore, setDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD5sK2mocTOB04GyrOFM8Ya6OKZjYmL4So",
+  authDomain: "study-progress-7000c.firebaseapp.com",
+  projectId: "study-progress-7000c",
+  storageBucket: "study-progress-7000c.firebasestorage.app",
+  messagingSenderId: "220786454851",
+  appId: "1:220786454851:web:e2714126605a61deda7ff6",
+  measurementId: "G-C45M7KTYCX"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+
 const DISCIPLINES = [
   {
     id: "ti",
@@ -611,11 +630,18 @@ let activeTab = "ti";
 let statusFilter = "all";
 let saveTimeout = null;
 const STORAGE_KEY = "bb_tracker_v2";
+let currentUser = null;
+let authReady = false;
+let remoteEnabled = false;
 
 const storageAdapter = {
   async get(keyName) {
-    if (window.storage && typeof window.storage.get === "function") {
-      return window.storage.get(keyName);
+    if (remoteEnabled && currentUser) {
+      const snapshot = await getDoc(doc(db, "studyProgress", currentUser.uid));
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        return { value: JSON.stringify(data.state || {}) };
+      }
     }
 
     try {
@@ -626,14 +652,65 @@ const storageAdapter = {
     }
   },
   async set(keyName, value) {
-    if (window.storage && typeof window.storage.set === "function") {
-      return window.storage.set(keyName, value);
+    if (remoteEnabled && currentUser) {
+      await setDoc(doc(db, "studyProgress", currentUser.uid), {
+        state: JSON.parse(value),
+        updatedAt: new Date().toISOString(),
+        email: currentUser.email || null
+      }, { merge: true });
     }
 
     window.localStorage.setItem(keyName, value);
     return true;
   }
 };
+
+function updateSaveIndicator(message, isSaved = false) {
+  const ind = document.getElementById("save-ind");
+  if (!ind) return;
+  ind.className = isSaved ? "save-indicator saved" : "save-indicator";
+  ind.querySelector("span").textContent = message;
+}
+
+function renderAuthBar() {
+  let authBar = document.getElementById("auth-bar");
+  if (!authBar) {
+    authBar = document.createElement("div");
+    authBar.id = "auth-bar";
+    authBar.className = "disc-header";
+    document.body.insertBefore(authBar, document.getElementById("stats-grid"));
+  }
+
+  if (!authReady) {
+    authBar.innerHTML = '<div class="disc-title">Conectando ao Firebase...</div>';
+    return;
+  }
+
+  if (currentUser) {
+    authBar.innerHTML = `
+      <div class="disc-title">Sincronização ativa</div>
+      <div class="disc-meta">${currentUser.email || "Usuário autenticado"}</div>
+      <button class="filter-btn active" id="logout-btn">Sair</button>
+    `;
+    document.getElementById("logout-btn").onclick = async () => {
+      await signOut(auth);
+    };
+    return;
+  }
+
+  authBar.innerHTML = `
+    <div class="disc-title">Salvar na nuvem</div>
+    <div class="disc-meta">Entre com Google para sincronizar entre dispositivos</div>
+    <button class="filter-btn active" id="login-btn">Entrar com Google</button>
+  `;
+  document.getElementById("login-btn").onclick = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      updateSaveIndicator("Falha no login com Google");
+    }
+  };
+}
 
 function key(discId, topicIdx) { return `${discId}:${topicIdx}`; }
 
@@ -659,14 +736,13 @@ async function loadState() {
 
 function scheduleSave() {
   clearTimeout(saveTimeout);
-  const ind = document.getElementById("save-ind");
-  if (ind) { ind.className = "save-indicator"; ind.querySelector("span").textContent = "Salvando..."; }
+  updateSaveIndicator(remoteEnabled && currentUser ? "Sincronizando..." : "Salvando localmente...");
   saveTimeout = setTimeout(async () => {
     try {
       await storageAdapter.set(STORAGE_KEY, JSON.stringify(state));
-      if (ind) { ind.className = "save-indicator saved"; ind.querySelector("span").textContent = "Dados salvos ✓"; }
+      updateSaveIndicator(remoteEnabled && currentUser ? "Dados sincronizados ✓" : "Dados salvos localmente ✓", true);
     } catch(e) {
-      if (ind) { ind.querySelector("span").textContent = "Erro ao salvar"; }
+      updateSaveIndicator("Erro ao salvar");
     }
   }, 800);
 }
@@ -818,11 +894,24 @@ function renderContent() {
 }
 
 async function init() {
+  renderAuthBar();
   await loadState();
   renderStats();
   renderTabs();
   renderContent();
 }
+
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  authReady = true;
+  remoteEnabled = Boolean(user);
+  renderAuthBar();
+  await loadState();
+  renderStats();
+  renderTabs();
+  renderContent();
+  updateSaveIndicator(remoteEnabled && currentUser ? "Dados sincronizados com Firebase" : "Modo local ativo");
+});
 
 init();
 </script>
