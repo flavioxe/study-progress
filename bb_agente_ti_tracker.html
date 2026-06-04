@@ -1081,7 +1081,11 @@ function renderContent() {
 }
 
 async function init() {
-  await setPersistence(auth, browserLocalPersistence);
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+  } catch (error) {
+    updateSaveIndicator(`Persistência de login indisponível: ${describeAuthError(error)}`);
+  }
   renderAuthBar();
   await loadState();
   renderStats();
