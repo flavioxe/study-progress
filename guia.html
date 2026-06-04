@@ -18,165 +18,554 @@
 
     * { box-sizing: border-box; }
 
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Guia de Estudos | BB Agente de TI</title>
-      <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap');
+    body {
+      margin: 0;
+      padding: 24px;
+      background: radial-gradient(circle at top, rgba(79,142,247,0.12), transparent 30%), var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.7;
+    }
 
-        :root {
-          --bg: #0d0f14;
-          --surface: #161a24;
-          --border: #2a3048;
-          --text: #e8eaf0;
-          --muted: #94a3b8;
-          --accent: #4f8ef7;
-        }
+    .shell {
+      max-width: 980px;
+      margin: 0 auto;
+    }
 
-        * { box-sizing: border-box; }
+    .topbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding: 16px 18px;
+      background: rgba(22,26,36,0.85);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      position: sticky;
+      top: 16px;
+      backdrop-filter: blur(10px);
+      z-index: 2;
+    }
 
-        body {
-          margin: 0;
-          padding: 24px;
-          background: radial-gradient(circle at top, rgba(79,142,247,0.12), transparent 30%), var(--bg);
-          color: var(--text);
-          font-family: 'DM Sans', sans-serif;
-          line-height: 1.7;
-        }
+    .title {
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 1px;
+      font-size: 13px;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
 
-        .shell {
-          max-width: 980px;
-          margin: 0 auto;
-        }
+    .back {
+      color: white;
+      background: var(--accent);
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+    }
 
-        .topbar {
-          display: flex;
-          gap: 12px;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          margin-bottom: 24px;
-          padding: 16px 18px;
-          background: rgba(22,26,36,0.85);
-          border: 1px solid var(--border);
-          border-radius: 14px;
-          position: sticky;
-          top: 16px;
-          backdrop-filter: blur(10px);
-        }
+    .content {
+      background: rgba(22,26,36,0.8);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+    }
 
-        .title {
-          font-family: 'Space Mono', monospace;
-          letter-spacing: 1px;
-          font-size: 13px;
-          color: var(--accent);
-          text-transform: uppercase;
-        }
+    h1, h2, h3 {
+      line-height: 1.2;
+      margin-top: 1.5em;
+      margin-bottom: 0.6em;
+    }
 
-        .back {
-          color: white;
-          background: var(--accent);
-          text-decoration: none;
-          padding: 10px 14px;
-          border-radius: 10px;
-          font-size: 14px;
-          font-weight: 700;
-        }
-
-        .content {
-          background: rgba(22,26,36,0.8);
-          border: 1px solid var(--border);
-          border-radius: 18px;
-          padding: 28px;
-        }
-
-        h1, h2, h3 {
-          line-height: 1.2;
-          margin-top: 1.5em;
-          margin-bottom: 0.6em;
-        }
-
-        h1 { font-size: 2rem; }
-        h2 { font-size: 1.5rem; color: #dbeafe; }
-        h3 { font-size: 1.15rem; color: #bfdbfe; }
-        p, li { color: var(--text); }
-        ul { padding-left: 22px; }
-        hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
-        table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
-        th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
-        th { background: rgba(79,142,247,0.12); }
-        blockquote { margin: 18px 0; padding: 14px 16px; border-left: 4px solid var(--accent); background: rgba(79,142,247,0.08); color: #dbeafe; }
-        .muted { color: var(--muted); font-size: 13px; margin-top: 8px; }
-      </style>
-    </head>
-    <body>
-      <div class="shell">
-        <div class="topbar">
-          <div>
-            <div class="title">Guia Completo</div>
-            <div class="muted">Conteúdo incorporado diretamente para evitar falhas de carregamento no deploy</div>
-          </div>
-          <a class="back" href="/bb_agente_ti_tracker.html">Voltar ao tracker</a>
-        </div>
-
-        <article class="content">
-          <h1>Guia Completo de Estudos - BB Agente de Tecnologia</h1>
-          <p><strong>Banca: CESGRANRIO | Cargo: Escriturario - Agente de Tecnologia (Microrregiao 158 - TI)</strong><br><strong>Perfil: Iniciante em TI | Plano preventivo de 6 meses | Seg-Sex</strong></p>
-
-          <hr>
-
-          <h2>1. Edital Verticalizado</h2>
-
-          <h3>Estrutura da Prova</h3>
-          <table>
-            <thead>
-              <tr><th>Bloco</th><th>Disciplina</th><th>Questoes</th><th>Pontos</th><th>% do total</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Critico</td><td>Tecnologia da Informacao</td><td>35</td><td>52,5</td><td>52,5%</td></tr>
-              <tr><td>Alta</td><td>Lingua Portuguesa</td><td>10</td><td>15,0</td><td>15,0%</td></tr>
-              <tr><td>Media</td><td>Probabilidade e Estatistica</td><td>5</td><td>7,5</td><td>7,5%</td></tr>
-              <tr><td>Media</td><td>Conhecimentos Bancarios</td><td>5</td><td>7,5</td><td>7,5%</td></tr>
-              <tr><td>Media</td><td>Matematica</td><td>5</td><td>7,5</td><td>7,5%</td></tr>
-              <tr><td>Menor</td><td>Lingua Inglesa</td><td>5</td><td>5,0</td><td>5,0%</td></tr>
-              <tr><td>Menor</td><td>Atualidades do Mercado Financeiro</td><td>5</td><td>5,0</td><td>5,0%</td></tr>
-              <tr><td></td><td><strong>Total</strong></td><td><strong>70</strong></td><td><strong>100</strong></td><td><strong>100%</strong></td></tr>
-            </tbody>
-          </table>
-
-          <h3>Notas minimas para aprovacao</h3>
-          <ul>
-            <li>50% do total geral: minimo de 50 pontos</li>
-            <li>50% de conhecimentos basicos: minimo de 16,25 pontos</li>
-            <li>50% de conhecimentos especificos: minimo de 33,75 pontos</li>
-            <li>Nota zero em qualquer disciplina elimina automaticamente</li>
-          </ul>
-
-          <h3>Prioridade de TI</h3>
-          <p>TI concentra a maior parte da pontuacao e precisa entrar no ciclo diariamente. Banco de dados, algoritmos e linguagens sao os blocos mais criticos do edital.</p>
-
-          <blockquote>Se quiser, depois eu incorporo o guia completo inteiro nesta pagina, mas esta versao ja elimina o erro de carregamento no deploy.</blockquote>
-        </article>
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; color: #dbeafe; }
+    h3 { font-size: 1.15rem; color: #bfdbfe; }
+    p, li { color: var(--text); }
+    ul, ol { padding-left: 22px; }
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: rgba(79,142,247,0.12); }
+    blockquote { margin: 18px 0; padding: 14px 16px; border-left: 4px solid var(--accent); background: rgba(79,142,247,0.08); color: #dbeafe; }
+    code { font-family: 'Space Mono', monospace; color: #93c5fd; }
+    .muted { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div>
+        <div class="title">Guia Completo</div>
+        <div class="muted">Markdown completo renderizado localmente na própria página</div>
       </div>
-    </body>
-    </html>
+      <a class="back" href="/bb_agente_ti_tracker.html">Voltar ao tracker</a>
+    </div>
+
+    <article class="content" id="content">Carregando guia...</article>
+  </div>
+
+  <script>
+    const markdown = String.raw`# 📚 Guia Completo de Estudos — BB Agente de Tecnologia
+**Banca: CESGRANRIO | Cargo: Escriturário — Agente de Tecnologia (Microrregião 158 - TI)**
+**Perfil: Iniciante em TI | Plano preventivo de 6 meses | Seg–Sex**
+
+---
+
+## 1. EDITAL VERTICALIZADO
+
+### Estrutura da Prova
+
+| Bloco | Disciplina | Questões | Pontos | % do total |
+|---|---|---|---|---|
+| 🔴 CRÍTICO | Tecnologia da Informação | 35 | 52,5 | 52,5% |
+| 🟠 ALTA | Língua Portuguesa | 10 | 15,0 | 15,0% |
+| 🟡 MÉDIA | Probabilidade e Estatística | 5 | 7,5 | 7,5% |
+| 🟡 MÉDIA | Conhecimentos Bancários | 5 | 7,5 | 7,5% |
+| 🟡 MÉDIA | Matemática | 5 | 7,5 | 7,5% |
+| 🟢 MENOR | Língua Inglesa | 5 | 5,0 | 5,0% |
+| 🟢 MENOR | Atualidades do Mercado Financeiro | 5 | 5,0 | 5,0% |
+| | **TOTAL** | **70** | **100** | **100%** |
+
+### Notas mínimas para aprovação (eliminatório)
+- 50% do total geral → mínimo **50 pontos**
+- 50% de Conhecimentos Básicos → mínimo **16,25 pontos** (de 32,5)
+- 50% de Conhecimentos Específicos → mínimo **33,75 pontos** (de 67,5)
+- Nota zero em qualquer disciplina → eliminado automaticamente
+
+---
+
+### 🔴 TI — 35 questões / 52,5 pontos (PRIORIDADE MÁXIMA)
+
+Estimativa de distribuição interna das 35 questões (baseada em padrões CESGRANRIO):
+
+| Subtema | Estimativa de questões | Prioridade |
+|---|---|---|
+| Banco de Dados (SQL, NoSQL, modelagem) | 8–10 | 🔴 Crítica |
+| Estrutura de dados e algoritmos | 6–8 | 🔴 Crítica |
+| Linguagens e ferramentas (Python, Java, TS) | 6–8 | 🔴 Crítica |
+| Aprendizagem de máquina / IA | 5–6 | 🟠 Alta |
+| Big Data | 4–5 | 🟡 Média |
+| Desenvolvimento Mobile | 3–5 | 🟡 Média |
+
+**Conteúdo completo por subtema:**
+
+**1. Aprendizagem de Máquina**
+- Fundamentos básicos de ML
+- Algoritmos de aprendizado supervisionado (classificação, regressão)
+- Algoritmos de aprendizado não supervisionado (clustering, redução de dimensionalidade)
+- Noções de Processamento de Linguagem Natural (PLN)
+
+**2. Banco de Dados**
+- NoSQL: conceitos básicos, bancos orientados a grafos, colunas, chave/valor e documentos
+- MongoDB (operações básicas, documentos JSON)
+- SQL 2008 (SELECT, JOIN, GROUP BY, subconsultas, funções de janela)
+- Conceitos de SGBD (transações, ACID, índices, views)
+- Data Warehouse (modelagem conceitual, dados multidimensionais, OLAP, star schema, snowflake)
+- Modelagem conceitual: abordagem entidade-relacionamento (ER)
+- Modelo relacional: conceitos básicos, normalização (1FN, 2FN, 3FN, BCNF)
+- PostgreSQL (diferenciais em relação ao SQL padrão)
+
+**3. Big Data**
+- Fundamentos e os 5 Vs (volume, velocidade, variedade, veracidade, valor)
+- Técnicas de preparação de dados (limpeza, transformação, integração)
+- Técnicas de apresentação de dados (visualização, dashboards)
+
+**4. Desenvolvimento Mobile**
+- Java/Kotlin para Android
+- Swift para iOS
+- React Native 0.59 (componentes básicos, navegação)
+- Android API 30 (permissões, ciclo de vida, manifests)
+- iOS xCode 10 (interface builder, storyboards)
+
+**5. Estrutura de Dados e Algoritmos**
+- Busca sequencial em arrays
+- Busca binária em arrays (pré-requisito: array ordenado)
+- Ordenação por bolha (Bubble Sort) — complexidade O(n²)
+- Ordenação por seleção (Selection Sort) — complexidade O(n²)
+- Ordenação por inserção (Insertion Sort) — complexidade O(n²)
+- Lista encadeada (simples e dupla)
+- Pilha (LIFO — Last In, First Out)
+- Fila (FIFO — First In, First Out)
+- Noções sobre árvore binária (raiz, folha, altura, percursos)
+
+**6. Ferramentas e Linguagens de Programação**
+- Ansible (automação de infraestrutura, playbooks, inventário)
+- Java SE 11 (orientação a objetos, Collections, Streams, lambdas)
+- Java EE 8 (servlets, JPA, CDI, JAX-RS)
+- TypeScript 4.0 (tipagem estática, interfaces, generics, decorators)
+- Python 3.9.x para IA/ML e Analytics:
+  - Pandas (DataFrames, operações, leitura de dados)
+  - NumPy (arrays, operações matemáticas, álgebra linear)
+  - SciPy (otimização, estatísticas, integração)
+  - Matplotlib (gráficos, plots, subplots)
+  - Scikit-learn (modelos de ML, pré-processamento, avaliação)
+
+---
+
+### 🟠 LÍNGUA PORTUGUESA — 10 questões / 15 pontos
+
+1. Compreensão de textos (inferência, tema, argumento principal)
+2. Ortografia oficial (acordo ortográfico 2009)
+3. Classe e emprego de palavras (substantivo, adjetivo, verbo, advérbio, preposição, conjunção)
+4. Emprego do acento indicativo de crase
+5. Sintaxe da oração e do período (sujeito, predicado, objeto, adjunto)
+6. Emprego dos sinais de pontuação
+7. Concordância verbal e nominal
+8. Regência verbal e nominal
+9. Colocação dos pronomes oblíquos átonos (próclise, mesóclise e ênclise)
+
+---
+
+### 🟡 MATEMÁTICA — 5 questões / 7,5 pontos
+
+1. Números inteiros, racionais e reais; problemas de contagem (fatorial, combinações, permutações)
+2. Sistema legal de medidas
+3. Razões e proporções; divisão proporcional; regra de três simples e composta; porcentagens
+4. Lógica proposicional (tabela verdade, conectivos, tautologia, contradição)
+5. Noções de conjuntos (união, intersecção, complementar, produto cartesiano)
+6. Relações e funções; funções polinomiais; exponenciais e logarítmicas
+7. Matrizes (operações, tipos)
+8. Determinantes (regra de Sarrus, Laplace)
+9. Sistemas lineares (Regra de Cramer, escalonamento)
+10. Sequências
+11. Progressões aritméticas e geométricas (soma, termo geral)
+
+---
+
+### 🟡 PROBABILIDADE E ESTATÍSTICA — 5 questões / 7,5 pontos
+
+1. Representação tabular e gráfica (tabelas de frequência, histograma, ogiva, boxplot)
+2. Medidas de tendência central: média, mediana, moda
+3. Medidas de posição: mínimo, máximo, quartis, percentis
+4. Medidas de dispersão: amplitude, amplitude interquartil, variância, desvio padrão, coeficiente de variação
+5. Variáveis aleatórias e distribuição de probabilidade
+6. Teorema de Bayes
+7. Probabilidade condicional
+8. População e amostra
+9. Variância e covariância
+10. Correlação linear simples (coeficiente de Pearson)
+11. Distribuição binomial (parâmetros, cálculo de probabilidades)
+12. Distribuição normal (curva gaussiana, Z-score, tabela)
+13. Noções de amostragem e inferência estatística (IC, teste de hipótese)
+
+---
+
+### 🟡 CONHECIMENTOS BANCÁRIOS — 5 questões / 7,5 pontos
+
+1. SFN: Estrutura geral e órgãos normativos (CMN, BCB, CVM)
+2. Instituições supervisoras, executoras e operadoras
+3. Mercados: monetário, de crédito, de capitais e cambial
+4. Moeda e política monetária; Quantitative Easing
+5. Taxa SELIC e operações compromissadas
+6. Depósitos remunerados no Banco Central
+7. Orçamento público, Tesouro Nacional e dívida pública
+8. Produtos Bancários: cartões de crédito/débito, CDC, crédito rural, poupança
+9. Capitalização, previdência, consórcio, investimentos e seguros
+10. Noções de Mercado de Capitais
+11. Mercado de Câmbio: instituições e operações básicas
+12. Regimes de taxa de câmbio (fixo, flutuante, intermediários)
+13. Taxas de câmbio nominais e reais
+14. Impactos das taxas de câmbio sobre exportações e importações
+15. Diferencial de juros, prêmio de risco e fluxo de capitais
+16. Mercado interbancário
+17. Mercado bancário: tesouraria, varejo bancário e recuperação de crédito
+18. Taxas de juros curto prazo e curva de juros; taxas nominais e reais
+19. Garantias do SFN: aval, fiança, penhor, alienação fiduciária, hipoteca, fiança bancária
+20. Lavagem de dinheiro: conceito, etapas e legislação (Lei 9.613/98, Circular 3.978/2020, CC 4.001/2020)
+21. Autorregulação bancária e Normativos SARB
+22. Sigilo Bancário: Lei Complementar 105/2001
+23. LGPD: Lei 13.709/2018
+24. Legislação anticorrupção: Lei 12.846/2013 e Decreto 11.129/2022
+25. Segurança cibernética: Resolução CMN 4.893/2021
+26. Ética aplicada e Código de Ética do BB
+27. Política de Responsabilidade Socioambiental do BB
+
+---
+
+### 🟢 LÍNGUA INGLESA — 5 questões / 5 pontos
+
+1. Vocabulário fundamental (cognatos, false friends, vocabulário técnico)
+2. Aspectos gramaticais básicos para compreensão de textos (tempos verbais, voz passiva, conectores)
+3. Estratégias de leitura (skimming, scanning, inferência de significado pelo contexto)
+
+> **Estratégia:** CESGRANRIO costuma cobrar textos de tecnologia em inglês. Contexto ajuda muito. Não deixe a disciplina para zero, mas não gaste horas excessivas nela.
+
+---
+
+### 🟢 ATUALIDADES DO MERCADO FINANCEIRO — 5 questões / 5 pontos
+
+1. Os bancos na Era Digital: atualidade, tendências e desafios
+2. Internet banking e Mobile banking
+3. Open banking / Open finance
+4. Novos modelos de negócios digitais
+5. Fintechs, startups e big techs no setor financeiro
+6. Shadow banking (sistema bancário sombra)
+7. Funções da moeda
+8. Blockchain, bitcoin e demais criptomoedas
+9. Marketplace
+10. Correspondentes bancários
+11. Arranjos de pagamentos
+12. PIX: funcionamento, tipos de chave, limites
+13. Segmentação e interações digitais
+14. Transformação digital no Sistema Financeiro
+
+---
+
+## 2. PLANO DE ESTUDOS — 6 MESES
+
+### Princípios do plano
+- TI é inegociável: sempre na pauta, todo dia
+- Introduzir uma nova matéria por vez para não sobrecarregar
+- Cada nova matéria entra enquanto a anterior continua em revisão
+- Semana não tem horário rígido, mas tem uma **ordem sugerida de assuntos**
+- Revisão com Anki **todo dia à noite** (15–30 min)
+
+---
+
+### 🗓️ FASE 1 — Diagnóstico + Setup (Semanas 1–2)
+
+**Objetivo:** Saber onde você está antes de começar.
+
+**Semana 1:**
+- Segunda: Baixe uma prova antiga de CESGRANRIO BB (sugestão: BB 2021 Agente de Tecnologia ou similar). Faça do início ao fim sem estudar nada antes.
+- Anote quantas acertou em cada disciplina. Esse é seu **baseline**.
+- Terça a Sexta: Assista as primeiras aulas de TI no Gran Cursos. Foco em **Estrutura de Dados e Algoritmos** (começa pelo mais concreto e visual). Assista no ritmo normal, pausa quando não entender.
+- Instale o **Anki** e comece a criar os primeiros cards.
+
+**Semana 2:**
+- Continue TI (Estrutura de Dados)
+- Comece a configurar o TecConcursos com filtro de banca: CESGRANRIO
+- Crie uma pasta de erros: sempre que errar uma questão, anote o tema e o motivo do erro
+
+**Modelo de semana Fase 1:**
+| Dia | Manhã | Noite |
+|---|---|---|
+| Seg | TI: vídeo aula + resumo (2h) | Anki (20 min) |
+| Ter | TI: vídeo aula + questões (3h) | Anki (20 min) |
+| Qua | TI: questões TecConcursos CESGRANRIO (2h) + revisão erros (1h) | Anki (20 min) |
+| Qui | TI: novo subtema + anotações (3h) | Anki (20 min) |
+| Sex | TI: resolução de questões (2h) + organização Anki (1h) | Anki (20 min) |
+
+---
+
+### 🗓️ FASE 2 — TI Intensivo (Semanas 3–10)
+
+**Objetivo:** Construir base sólida em TI. É aqui que a prova se ganha.
+
+**Ordem sugerida de subtemas de TI:**
+1. Estrutura de Dados e Algoritmos (semanas 3–4)
+2. Banco de Dados Relacional + SQL (semanas 5–6)
+3. Banco de Dados NoSQL + MongoDB + PostgreSQL (semana 7)
+4. Big Data (semana 7, junto com NoSQL — temática parecida)
+5. Python para dados (Pandas, NumPy, Matplotlib, Scikit-learn) (semanas 8–9)
+6. Aprendizagem de Máquina (semana 10, aproveita base de Python)
+
+> Desenvolvimento Mobile e Linguagens (Java, TypeScript, Ansible) entram na Fase 3 para não acumular tudo de uma vez.
+
+**Modelo de semana Fase 2:**
+| Dia | Manhã | Noite |
+|---|---|---|
+| Seg | TI: vídeo aula novo subtema (2h) + resumo/Anki cards (1h) | Anki (20 min) |
+| Ter | TI: vídeo aula continuação (2h) + questões CESGRANRIO (1h) | Anki (20 min) |
+| Qua | TI: questões (2h) + revisão erros da semana (1h) | Anki (20 min) |
+| Qui | TI: fechar subtema + questões (2h) + Português 30 min (introdução leve) | Anki (20 min) |
+| Sex | Revisão geral da semana (1,5h) + questões mistas TI (1h) | Anki (25 min) |
+
+---
+
+### 🗓️ FASE 3 — TI + Conhecimentos Bancários + Linguagens (Semanas 11–18)
+
+**Objetivo:** Introduzir Conhecimentos Bancários sem abrir mão do TI.
+
+**Ordem sugerida:**
+- Continuar TI (Java, TypeScript, Ansible, Mobile) nas manhãs
+- Introduzir Conhecimentos Bancários a partir da semana 11 (canal William Capriata ou Renan Duarte + Gran Cursos)
+- Introduzir Português gradualmente (Álvaro Ferreira)
+
+**Modelo de semana Fase 3:**
+| Dia | Manhã | Noite |
+|---|---|---|
+| Seg | TI: Java/TypeScript (2h) + Bancários: SFN (1h) | Anki (25 min) |
+| Ter | TI: questões (2h) + Bancários: produtos bancários (1h) | Anki (25 min) |
+| Qua | TI: Mobile/Ansible (2h) + Português: compreensão de texto (1h) | Anki (25 min) |
+| Qui | Bancários: câmbio, juros, garantias (2h) + TI revisão (1h) | Anki (25 min) |
+| Sex | Questões mistas TI + Bancários (2h) + revisão erros (1h) | Anki (25 min) |
+
+---
+
+### 🗓️ FASE 4 — Todas as matérias + Simulados (Semanas 19–22)
+
+**Objetivo:** Fechar o conteúdo, começar simulados, introduzir redação.
+
+**Novidades nessa fase:**
+- Introduzir Probabilidade e Estatística (Júlio César — BizuMatemática)
+- Introduzir Matemática Básica
+- Começar a escrever 1 redação por semana no Glau
+- Fazer 1 simulado completo por semana no ThinkU ou TecConcursos
+
+**Modelo de semana Fase 4:**
+| Dia | Manhã | Noite |
+|---|---|---|
+| Seg | TI revisão (1,5h) + Prob&Estat (1,5h) | Anki (25 min) |
+| Ter | TI questões CESGRANRIO (1h) + Português (1,5h) + Inglês (0,5h) | Anki (25 min) |
+| Qua | Bancários revisão (1h) + Atualidades Mercado Financeiro (1h) + Matemática (1h) | Anki (25 min) |
+| Qui | **Simulado completo** (2,5–3h) | Revisão erros do simulado |
+| Sex | Revisão erros do simulado (1,5h) + Redação no Glau (1h) | Anki (25 min) |
+
+---
+
+### 🗓️ FASE 5 — Revisão Total + Intensivão (Semanas 23–26)
+
+**Objetivo:** Consolidar, eliminar pontos cegos, afinar redação.
+
+- 2 simulados por semana (ThinkU + TecConcursos alternados)
+- Revisão focada nas disciplinas com menor % de acerto nos simulados
+- TI: resolver questões de todos os subtemas, priorizar onde ainda erra
+- Redação: 1–2 por semana, com correção no Glau + releitura dos critérios da banca
+- Anki em modo intenso: revisões dobradas
+
+**Modelo de semana Fase 5:**
+| Dia | Manhã | Noite |
+|---|---|---|
+| Seg | Simulado #1 (2,5h) | Revisão erros |
+| Ter | Revisão erros do simulado + TI pontos fracos (3h) | Anki |
+| Qua | Revisão Bancários + Português (2h) + Redação (1h) | Anki |
+| Qui | Simulado #2 (2,5h) | Revisão erros |
+| Sex | Revisão erros + Inglês + Atualidades (2,5h) | Anki intenso |
+
+---
+
+## 3. TÉCNICAS DE ESTUDO E REVISÃO
+
+### A sequência ideal para estudar uma matéria nova
+
+1. **Vídeo aula** — Absorção passiva. Assista sem pausas para tomar notas longas. Só pause quando não entender absolutamente nada.
+2. **PDF/material escrito** — Leia ativamente. Grife o essencial. Escreva com suas próprias palavras o que você entendeu.
+3. **Questões CESGRANRIO** — Resolva de 10 a 20 questões logo após estudar o tema. Errou? Anote o motivo específico do erro.
+4. **Anki** — Crie os cards com o conteúdo ainda fresco. Não deixe para depois.
+
+---
+
+### Como usar o Anki corretamente
+
+O Anki usa repetição espaçada: te mostra um card com mais frequência quando você erra e com menos frequência quando você acerta. Isso maximiza a retenção com menos tempo.
+
+**Boas práticas:**
+- Frente do card: uma pergunta curta e específica. Ex: *"Qual é a complexidade do Bubble Sort no pior caso?"*
+- Verso do card: resposta direta. Ex: *"O(n²)"*
+- Não crie cards com blocos de texto. Um card = um conceito.
+- Revise todos os dias (15–30 min à noite). Pular um dia cria acúmulo.
+- Use imagens quando o conceito for visual (ex: diagrama ER, estrutura de lista encadeada).
+- Baralhos sugeridos: um por disciplina.
+
+**Quando criar os cards:** no mesmo dia que estudou o conteúdo, nunca depois de uma semana.
+
+---
+
+### Ciclo de revisão por tema
+
+| Momento | O que fazer |
+|---|---|
+| Mesmo dia | Releia o resumo por 10–15 minutos antes de dormir |
+| 1 semana depois | Resolva 10–15 questões do tema sem consultar material |
+| 1 mês depois | Revisão com Anki + 10 questões |
+| 3 meses depois | Simulado que inclua o tema |
+
+---
+
+### Como usar as questões de forma inteligente
+
+- **Sempre filtre por banca CESGRANRIO** no TecConcursos. Cada banca tem linguagem e pegadinhas diferentes.
+- Não resolva questões no modo "treino contínuo". Resolva por tema específico primeiro, depois mescle.
+- A pasta de erros é sagrada: sempre anote o tema, a sua resposta, a resposta certa e o motivo do erro. Categorias comuns de erro: falta de conhecimento, confusão entre conceitos parecidos, leitura errada do enunciado.
+- Quando terminar um subtema, faça um mini-simulado de 10–15 questões só daquele subtema.
+
+---
+
+### Como medir sua evolução (baseline e revisitas)
+
+1. Antes de começar: faça uma prova CESGRANRIO BB completa sem estudar. Anote o % por disciplina.
+2. A cada 4–6 semanas: refaça uma prova (pode ser diferente) e compare com o baseline.
+3. Meta razoável: estar acima de 60–65% de acerto por disciplina antes de entrar em fase de simulados.
+4. TI: mínimo de 55–60% de acerto (são 35 questões, precisar acertar ao menos 18–20 para sobrar margem no restante).
+
+---
+
+### Plataformas e como usar cada uma
+
+| Plataforma | Uso ideal |
+|---|---|
+| **Gran Cursos Online** | Vídeo aulas completas + PDFs + questões comentadas. Base principal de conteúdo. |
+| **TecConcursos** | Questões de provas anteriores filtradas por banca (CESGRANRIO). Prioridade máxima para questões. |
+| **Anki** | Revisão espaçada diária. Instale o app no celular para revisar em qualquer momento. |
+| **William Capriata (YouTube)** | Conhecimentos bancários (gratuito, excelente para o BB especificamente). |
+| **Renan Duarte (YouTube)** | Bancários + Atualidades + Vendas. Gratuito. |
+| **BizuMatemática — Júlio César (YouTube)** | Matemática básica e financeira. Gratuito, didático. |
+| **Direção Concursos (YouTube)** | Informática e Inglês. Gratuito. |
+| **Álvaro Ferreira (YouTube)** | Português para concursos. Gratuito. |
+| **Glau (glau.com.br)** | Correção gratuita de redação. Use 1x por semana a partir do mês 4. |
+| **ThinkU** | Simulados completos. Use para simular condição real de prova. |`;
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function inlineMarkdown(text) {
+      return text
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    }
+
+    function parseTable(lines, start) {
+      const tableLines = [];
+      let index = start;
+      while (index < lines.length && /^\|.*\|$/.test(lines[index].trim())) {
+        tableLines.push(lines[index].trim());
+        index += 1;
+      }
+
+      if (tableLines.length < 2) {
+        return null;
+      }
+
+      const rows = tableLines
+        .filter((line, idx) => !(idx === 1 && /^\|?\s*[-:| ]+\|\s*$/.test(line)))
+        .map((line) => line.slice(1, -1).split('|').map((cell) => inlineMarkdown(escapeHtml(cell.trim()))));
+
+      const header = rows.shift() || [];
+      const thead = `<thead><tr>${header.map((cell) => `<th>${cell}</th>`).join('')}</tr></thead>`;
+      const tbody = `<tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody>`;
+      return { html: `<table>${thead}${tbody}</table>`, nextIndex: index };
+    }
+
+    function markdownToHtml(source) {
+      const lines = source.replace(/\r/g, '').split('\n');
+      const html = [];
+      let listType = null;
+
+      for (let i = 0; i < lines.length; i += 1) {
+        const line = lines[i].trim();
 
         if (!line) {
-          if (inList) {
-            html.push('</ul>');
-            inList = false;
+          if (listType) {
+            html.push(listType === 'ol' ? '</ol>' : '</ul>');
+            listType = null;
           }
           continue;
         }
 
         const table = parseTable(lines, i);
         if (table) {
-          if (inList) {
-            html.push('</ul>');
-            inList = false;
+          if (listType) {
+            html.push(listType === 'ol' ? '</ol>' : '</ul>');
+            listType = null;
           }
           html.push(table.html);
           i = table.nextIndex - 1;
@@ -184,87 +573,86 @@
         }
 
         if (line === '---') {
-          if (inList) {
-            html.push('</ul>');
-            inList = false;
+          if (listType) {
+            html.push(listType === 'ol' ? '</ol>' : '</ul>');
+            listType = null;
           }
           html.push('<hr>');
           continue;
         }
 
         if (line.startsWith('### ')) {
-          if (inList) {
-            html.push('</ul>');
-            inList = false;
+          if (listType) {
+            html.push(listType === 'ol' ? '</ol>' : '</ul>');
+            listType = null;
           }
           html.push(`<h3>${inlineMarkdown(escapeHtml(line.slice(4)))}</h3>`);
           continue;
         }
 
         if (line.startsWith('## ')) {
-          if (inList) {
-            html.push('</ul>');
-            inList = false;
+          if (listType) {
+            html.push(listType === 'ol' ? '</ol>' : '</ul>');
+            listType = null;
           }
           html.push(`<h2>${inlineMarkdown(escapeHtml(line.slice(3)))}</h2>`);
           continue;
         }
 
         if (line.startsWith('# ')) {
-          if (inList) {
-            html.push('</ul>');
-            inList = false;
+          if (listType) {
+            html.push(listType === 'ol' ? '</ol>' : '</ul>');
+            listType = null;
           }
           html.push(`<h1>${inlineMarkdown(escapeHtml(line.slice(2)))}</h1>`);
           continue;
         }
 
         if (line.startsWith('> ')) {
-          if (inList) {
-            html.push('</ul>');
-            inList = false;
+          if (listType) {
+            html.push(listType === 'ol' ? '</ol>' : '</ul>');
+            listType = null;
           }
           html.push(`<blockquote>${inlineMarkdown(escapeHtml(line.slice(2)))}</blockquote>`);
           continue;
         }
 
-        if (/^[-*] /.test(line) || /^\d+\. /.test(line)) {
-          if (!inList) {
-            html.push('<ul>');
-            inList = true;
+        if (/^\d+\. /.test(line)) {
+          if (listType !== 'ol') {
+            if (listType) html.push('</ul>');
+            html.push('<ol>');
+            listType = 'ol';
           }
-          html.push(`<li>${inlineMarkdown(escapeHtml(line.replace(/^[-*] /, '').replace(/^\d+\. /, '')))}</li>`);
+          html.push(`<li>${inlineMarkdown(escapeHtml(line.replace(/^\d+\. /, '')))}</li>`);
           continue;
         }
 
-        if (inList) {
-          html.push('</ul>');
-          inList = false;
+        if (/^[-*] /.test(line)) {
+          if (listType !== 'ul') {
+            if (listType) html.push('</ol>');
+            html.push('<ul>');
+            listType = 'ul';
+          }
+          html.push(`<li>${inlineMarkdown(escapeHtml(line.replace(/^[-*] /, '')))}</li>`);
+          continue;
+        }
+
+        if (listType) {
+          html.push(listType === 'ol' ? '</ol>' : '</ul>');
+          listType = null;
         }
 
         html.push(`<p>${inlineMarkdown(escapeHtml(line))}</p>`);
       }
 
-      if (inList) {
-        html.push('</ul>');
+      if (listType) {
+        html.push(listType === 'ol' ? '</ol>' : '</ul>');
       }
 
       return html.join('');
     }
 
-    fetch('/guia-completo-bb-agente-ti.md')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Nao foi possivel carregar o guia');
-        }
-        return response.text();
-      })
-      .then((markdown) => {
-        document.getElementById('content').innerHTML = markdownToHtml(markdown);
-      })
-      .catch((error) => {
-        document.getElementById('content').innerHTML = `<p>Erro ao carregar o guia.</p><p class="muted">${error.message}</p>`;
-      });
+    document.getElementById('content').innerHTML = markdownToHtml(markdown);
   </script>
 </body>
 </html>
