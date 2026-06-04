@@ -1,0 +1,806 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a24;
+    --surface2: #1e2435;
+    --border: #2a3048;
+    --text: #e8eaf0;
+    --text-muted: #6b7490;
+    --accent: #4f8ef7;
+    --red: #ef4444;
+    --orange: #f59e0b;
+    --green: #22c55e;
+    --purple: #a78bfa;
+    --cyan: #06b6d4;
+    --pink: #ec4899;
+    
+    --status-0: #374151; /* não iniciado */
+    --status-1: #92400e; /* em andamento */
+    --status-2: #065f46; /* estudado */
+    --status-3: #7f1d1d; /* revisar */
+    --status-4: #4c1d95; /* revisado */
+    
+    --status-0-t: #9ca3af;
+    --status-1-t: #fbbf24;
+    --status-2-t: #34d399;
+    --status-3-t: #f87171;
+    --status-4-t: #c4b5fd;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.3);
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+  }
+
+  .progress-bar-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tab:hover { border-color: var(--accent); color: var(--text); }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .tab .badge {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .disc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .disc-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .disc-title { font-weight: 600; font-size: 15px; }
+  .disc-meta {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .disc-progress {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 120px;
+  }
+
+  .disc-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  .topics-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  .topics-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .topics-table tr:nth-child(even) td { background: rgba(255,255,255,0.015); }
+
+  .topics-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(42,48,72,0.5);
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .topic-name { color: var(--text); line-height: 1.4; }
+
+  .status-select {
+    appearance: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 130px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .status-select:focus { border-color: var(--accent); }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .note-input {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 3px 6px;
+    border-radius: 4px;
+    width: 100%;
+    outline: none;
+    transition: all 0.15s;
+  }
+
+  .note-input:focus {
+    border-color: var(--border);
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  .note-input::placeholder { color: var(--border); }
+
+  .priority-tag {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .save-indicator {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 0;
+  }
+
+  .save-indicator.saved { color: var(--green); }
+  .save-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .filter-label { font-size: 11px; color: var(--text-muted); }
+
+  .filter-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .filter-btn.active, .filter-btn:hover {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .empty { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-row">
+    <div class="logo">BB · Agente de TI</div>
+    <div style="font-size:11px;color:var(--text-muted);">Tracker de Estudos · CESGRANRIO</div>
+  </div>
+  <h1>Controle de <span>Progresso</span></h1>
+</header>
+
+<div class="stats-grid" id="stats-grid"></div>
+
+<div class="progress-bar-container">
+  <div class="progress-label">
+    <span>Progresso geral</span>
+    <span id="progress-pct">0%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="filter-row">
+  <span class="filter-label">Filtrar por status:</span>
+  <button class="filter-btn active" data-sf="all" onclick="setStatusFilter('all',this)">Todos</button>
+  <button class="filter-btn" data-sf="0" onclick="setStatusFilter('0',this)">Não iniciados</button>
+  <button class="filter-btn" data-sf="3" onclick="setStatusFilter('3',this)">Precisa revisar</button>
+  <button class="filter-btn" data-sf="1" onclick="setStatusFilter('1',this)">Em andamento</button>
+  <button class="filter-btn" data-sf="2" onclick="setStatusFilter('2',this)">Estudados</button>
+</div>
+
+<div id="content"></div>
+
+<div class="save-indicator" id="save-ind">
+  <div class="save-dot"></div>
+  <span>Dados salvos automaticamente</span>
+</div>
+
+<script>
+const DISCIPLINES = [
+  {
+    id: "ti",
+    name: "Tecnologia da Informação",
+    points: 52.5,
+    questions: 35,
+    color: "#4f8ef7",
+    priority: "🔴 CRÍTICO",
+    pColor: "#ef4444",
+    pBg: "rgba(239,68,68,0.15)",
+    topics: [
+      "Estrutura de Dados: Busca sequencial e binária em arrays",
+      "Estrutura de Dados: Ordenação Bubble Sort",
+      "Estrutura de Dados: Ordenação Selection Sort",
+      "Estrutura de Dados: Ordenação Insertion Sort",
+      "Estrutura de Dados: Lista encadeada",
+      "Estrutura de Dados: Pilha (LIFO)",
+      "Estrutura de Dados: Fila (FIFO)",
+      "Estrutura de Dados: Árvore binária",
+      "Banco de Dados: Modelo relacional e normalização (1FN, 2FN, 3FN)",
+      "Banco de Dados: Modelagem Entidade-Relacionamento (ER)",
+      "Banco de Dados: SQL 2008 (SELECT, JOIN, GROUP BY, subconsultas)",
+      "Banco de Dados: SGBD (ACID, transações, índices, views)",
+      "Banco de Dados: Data Warehouse (OLAP, star/snowflake schema)",
+      "Banco de Dados: NoSQL — conceitos gerais",
+      "Banco de Dados: NoSQL — orientado a documentos",
+      "Banco de Dados: NoSQL — orientado a grafos",
+      "Banco de Dados: NoSQL — chave/valor",
+      "Banco de Dados: NoSQL — colunar",
+      "Banco de Dados: MongoDB",
+      "Banco de Dados: PostgreSQL",
+      "Big Data: Fundamentos e os 5 Vs",
+      "Big Data: Técnicas de preparação de dados",
+      "Big Data: Técnicas de apresentação de dados",
+      "Python: fundamentos e sintaxe",
+      "Python: Pandas (DataFrames, operações)",
+      "Python: NumPy (arrays, álgebra linear)",
+      "Python: Matplotlib (gráficos, plots)",
+      "Python: SciPy (estatísticas, otimização)",
+      "Python: Scikit-learn (modelos, pré-processamento, avaliação)",
+      "ML: Fundamentos e conceitos básicos",
+      "ML: Algoritmos supervisionados (classificação, regressão)",
+      "ML: Algoritmos não supervisionados (clustering, redução)",
+      "ML: Processamento de Linguagem Natural (PLN)",
+      "Linguagens: Java SE 11 (OO, Collections, Streams, lambdas)",
+      "Linguagens: Java EE 8 (servlets, JPA, JAX-RS)",
+      "Linguagens: TypeScript 4.0 (tipagem, interfaces, generics)",
+      "Linguagens: Ansible (playbooks, inventário, automação)",
+      "Mobile: Java/Kotlin para Android",
+      "Mobile: Swift para iOS",
+      "Mobile: React Native 0.59",
+      "Mobile: Android API 30 (ciclo de vida, permissões)",
+      "Mobile: iOS xCode 10 (interface builder, storyboards)",
+    ]
+  },
+  {
+    id: "portugues",
+    name: "Língua Portuguesa",
+    points: 15.0,
+    questions: 10,
+    color: "#22c55e",
+    priority: "🟠 ALTA",
+    pColor: "#f59e0b",
+    pBg: "rgba(245,158,11,0.15)",
+    topics: [
+      "Compreensão de textos (inferência, tema, argumento principal)",
+      "Ortografia oficial (acordo ortográfico 2009)",
+      "Classe e emprego de palavras",
+      "Emprego do acento indicativo de crase",
+      "Sintaxe da oração e do período",
+      "Emprego dos sinais de pontuação",
+      "Concordância verbal",
+      "Concordância nominal",
+      "Regência verbal",
+      "Regência nominal",
+      "Colocação dos pronomes oblíquos átonos (próclise, mesóclise, ênclise)",
+    ]
+  },
+  {
+    id: "bancarios",
+    name: "Conhecimentos Bancários",
+    points: 7.5,
+    questions: 5,
+    color: "#f59e0b",
+    priority: "🟡 MÉDIA",
+    pColor: "#eab308",
+    pBg: "rgba(234,179,8,0.15)",
+    topics: [
+      "SFN: Estrutura e órgãos normativos (CMN, BCB, CVM)",
+      "SFN: Instituições supervisoras, executoras e operadoras",
+      "Mercados: monetário, crédito, capitais e cambial",
+      "Moeda e política monetária; Quantitative Easing",
+      "Taxa SELIC e operações compromissadas",
+      "Depósitos remunerados no Banco Central",
+      "Orçamento público, Tesouro Nacional e dívida pública",
+      "Produtos Bancários: cartões de crédito e débito",
+      "Produtos Bancários: CDC, crédito rural, poupança",
+      "Produtos Bancários: capitalização, previdência, consórcio",
+      "Produtos Bancários: investimentos e seguros",
+      "Noções de Mercado de Capitais",
+      "Mercado de Câmbio: instituições e operações básicas",
+      "Regimes de taxa de câmbio (fixo, flutuante, intermediários)",
+      "Taxas de câmbio nominais e reais; impacto em exportações/importações",
+      "Diferencial de juros, prêmio de risco e fluxo de capitais",
+      "Mercado interbancário",
+      "Mercado bancário: tesouraria, varejo e recuperação de crédito",
+      "Taxas de juros curto prazo e curva de juros",
+      "Garantias do SFN: aval, fiança, penhor, alienação fiduciária, hipoteca",
+      "Lavagem de dinheiro: conceito, etapas e Lei 9.613/98",
+      "Circular 3.978/2020 e Carta Circular 4.001/2020",
+      "Autorregulação bancária e Normativos SARB",
+      "Sigilo Bancário: Lei Complementar 105/2001",
+      "LGPD: Lei 13.709/2018",
+      "Lei Anticorrupção: Lei 12.846/2013 e Decreto 11.129/2022",
+      "Segurança cibernética: Resolução CMN 4.893/2021",
+      "Ética aplicada e Código de Ética do BB",
+      "Política de Responsabilidade Socioambiental do BB",
+    ]
+  },
+  {
+    id: "probstat",
+    name: "Probabilidade e Estatística",
+    points: 7.5,
+    questions: 5,
+    color: "#a78bfa",
+    priority: "🟡 MÉDIA",
+    pColor: "#eab308",
+    pBg: "rgba(234,179,8,0.15)",
+    topics: [
+      "Representação tabular e gráfica (tabelas, histograma, ogiva, boxplot)",
+      "Medidas de tendência central: média, mediana, moda",
+      "Medidas de posição: mín, máx, quartis, percentis",
+      "Medidas de dispersão: amplitude, IQR, variância, desvio padrão, CV",
+      "Variáveis aleatórias e distribuição de probabilidade",
+      "Teorema de Bayes",
+      "Probabilidade condicional",
+      "População e amostra",
+      "Variância e covariância",
+      "Correlação linear simples (coeficiente de Pearson)",
+      "Distribuição binomial",
+      "Distribuição normal (Z-score, tabela)",
+      "Noções de amostragem e inferência estatística",
+    ]
+  },
+  {
+    id: "matematica",
+    name: "Matemática",
+    points: 7.5,
+    questions: 5,
+    color: "#06b6d4",
+    priority: "🟡 MÉDIA",
+    pColor: "#eab308",
+    pBg: "rgba(234,179,8,0.15)",
+    topics: [
+      "Números inteiros, racionais e reais",
+      "Problemas de contagem (fatorial, combinações, permutações)",
+      "Sistema legal de medidas",
+      "Razões e proporções; divisão proporcional",
+      "Regra de três simples e composta; porcentagens",
+      "Lógica proposicional (tabela verdade, conectivos)",
+      "Noções de conjuntos (união, intersecção, complementar)",
+      "Relações e funções; funções polinomiais",
+      "Funções exponenciais e logarítmicas",
+      "Matrizes (operações e tipos)",
+      "Determinantes (Sarrus, Laplace)",
+      "Sistemas lineares (Cramer, escalonamento)",
+      "Sequências numéricas",
+      "Progressões aritméticas (PA)",
+      "Progressões geométricas (PG)",
+    ]
+  },
+  {
+    id: "ingles",
+    name: "Língua Inglesa",
+    points: 5.0,
+    questions: 5,
+    color: "#ec4899",
+    priority: "🟢 MENOR",
+    pColor: "#22c55e",
+    pBg: "rgba(34,197,94,0.15)",
+    topics: [
+      "Vocabulário fundamental (cognatos, false friends)",
+      "Vocabulário técnico de TI em inglês",
+      "Aspectos gramaticais básicos (tempos verbais, voz passiva)",
+      "Conectores e coesão textual em inglês",
+      "Estratégias de leitura (skimming, scanning)",
+      "Inferência de significado pelo contexto",
+    ]
+  },
+  {
+    id: "atualidades",
+    name: "Atualidades do Mercado Financeiro",
+    points: 5.0,
+    questions: 5,
+    color: "#f97316",
+    priority: "🟢 MENOR",
+    pColor: "#22c55e",
+    pBg: "rgba(34,197,94,0.15)",
+    topics: [
+      "Os bancos na Era Digital: tendências e desafios",
+      "Internet banking e Mobile banking",
+      "Open banking / Open finance",
+      "Novos modelos de negócios digitais",
+      "Fintechs, startups e big techs no setor financeiro",
+      "Shadow banking (sistema bancário sombra)",
+      "Funções da moeda",
+      "Blockchain, bitcoin e criptomoedas",
+      "Marketplace",
+      "Correspondentes bancários",
+      "Arranjos de pagamentos",
+      "PIX: funcionamento, tipos de chave, limites",
+      "Segmentação e interações digitais",
+      "Transformação digital no Sistema Financeiro",
+    ]
+  }
+];
+
+const STATUS_CONFIG = [
+  { key: "0", label: "Não iniciado", color: "#9ca3af", bg: "rgba(156,163,175,0.12)" },
+  { key: "1", label: "Em andamento", color: "#fbbf24", bg: "rgba(251,191,36,0.12)" },
+  { key: "2", label: "Estudado ✓",   color: "#34d399", bg: "rgba(52,211,153,0.12)" },
+  { key: "3", label: "Precisa revisar", color: "#f87171", bg: "rgba(248,113,113,0.12)" },
+  { key: "4", label: "Revisado ✓✓", color: "#c4b5fd", bg: "rgba(196,181,253,0.12)" },
+];
+
+let state = {}; // { "ti:0": {status: "0", note: ""}, ... }
+let activeTab = "ti";
+let statusFilter = "all";
+let saveTimeout = null;
+
+function key(discId, topicIdx) { return `${discId}:${topicIdx}`; }
+
+function getState(discId, idx) {
+  return state[key(discId, idx)] || { status: "0", note: "" };
+}
+
+function setState(discId, idx, field, val) {
+  const k = key(discId, idx);
+  if (!state[k]) state[k] = { status: "0", note: "" };
+  state[k][field] = val;
+  scheduleSave();
+  renderStats();
+  renderDiscHeader(discId);
+}
+
+async function loadState() {
+  try {
+    const r = await window.storage.get("bb_tracker_v2");
+    if (r && r.value) state = JSON.parse(r.value);
+  } catch(e) { state = {}; }
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimeout);
+  const ind = document.getElementById("save-ind");
+  if (ind) { ind.className = "save-indicator"; ind.querySelector("span").textContent = "Salvando..."; }
+  saveTimeout = setTimeout(async () => {
+    try {
+      await window.storage.set("bb_tracker_v2", JSON.stringify(state));
+      if (ind) { ind.className = "save-indicator saved"; ind.querySelector("span").textContent = "Dados salvos ✓"; }
+    } catch(e) {
+      if (ind) { ind.querySelector("span").textContent = "Erro ao salvar"; }
+    }
+  }, 800);
+}
+
+function countByStatus(discId) {
+  const disc = DISCIPLINES.find(d => d.id === discId);
+  const counts = { "0":0, "1":0, "2":0, "3":0, "4":0 };
+  disc.topics.forEach((_, i) => {
+    const s = getState(discId, i).status;
+    counts[s] = (counts[s] || 0) + 1;
+  });
+  return counts;
+}
+
+function renderStats() {
+  const totalTopics = DISCIPLINES.reduce((s, d) => s + d.topics.length, 0);
+  let studied = 0, reviewing = 0, inProgress = 0, revised = 0;
+  DISCIPLINES.forEach(d => {
+    d.topics.forEach((_, i) => {
+      const s = getState(d.id, i).status;
+      if (s === "2") studied++;
+      if (s === "3") reviewing++;
+      if (s === "1") inProgress++;
+      if (s === "4") revised++;
+    });
+  });
+  const done = studied + revised;
+  const pct = Math.round((done / totalTopics) * 100);
+
+  document.getElementById("stats-grid").innerHTML = `
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--accent)">${totalTopics}</div>
+      <div class="stat-label">Total de tópicos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--status-1-t)">${inProgress}</div>
+      <div class="stat-label">Em andamento</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--status-2-t)">${studied}</div>
+      <div class="stat-label">Estudados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--status-3-t)">${reviewing}</div>
+      <div class="stat-label">Para revisar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--status-4-t)">${revised}</div>
+      <div class="stat-label">Revisados</div>
+    </div>
+  `;
+  document.getElementById("progress-pct").textContent = pct + "%";
+  document.getElementById("progress-fill").style.width = pct + "%";
+}
+
+function renderDiscHeader(discId) {
+  const el = document.getElementById("disc-header-" + discId);
+  if (!el) return;
+  const disc = DISCIPLINES.find(d => d.id === discId);
+  const counts = countByStatus(discId);
+  const done = (counts["2"] || 0) + (counts["4"] || 0);
+  const pct = Math.round((done / disc.topics.length) * 100);
+  const fillEl = el.querySelector(".disc-progress-fill");
+  const metaEl = el.querySelector(".disc-meta");
+  if (fillEl) fillEl.style.width = pct + "%";
+  if (metaEl) metaEl.textContent = `${done}/${disc.topics.length} tópicos · ${disc.questions}q · ${disc.points}pts`;
+}
+
+function renderTabs() {
+  document.getElementById("tabs").innerHTML = DISCIPLINES.map(d => {
+    const counts = countByStatus(d.id);
+    const done = (counts["2"] || 0) + (counts["4"] || 0);
+    return `<button class="tab ${d.id === activeTab ? 'active' : ''}" onclick="setTab('${d.id}')">
+      <span style="width:8px;height:8px;border-radius:50%;background:${d.color};display:inline-block"></span>
+      ${d.name.split(' ')[0]}${d.name.split(' ').length > 2 ? '...' : ''}
+      <span class="badge">${done}/${d.topics.length}</span>
+    </button>`;
+  }).join("");
+}
+
+function setTab(id) {
+  activeTab = id;
+  renderTabs();
+  renderContent();
+}
+
+function setStatusFilter(sf, btn) {
+  statusFilter = sf;
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderContent();
+}
+
+function renderContent() {
+  const disc = DISCIPLINES.find(d => d.id === activeTab);
+  const counts = countByStatus(disc.id);
+  const done = (counts["2"] || 0) + (counts["4"] || 0);
+  const pct = Math.round((done / disc.topics.length) * 100);
+
+  let filteredTopics = disc.topics.map((t, i) => ({ t, i }));
+  if (statusFilter !== "all") {
+    filteredTopics = filteredTopics.filter(({ i }) => getState(disc.id, i).status === statusFilter);
+  }
+
+  const rows = filteredTopics.map(({ t, i }) => {
+    const s = getState(disc.id, i);
+    const st = STATUS_CONFIG.find(x => x.key === s.status) || STATUS_CONFIG[0];
+    return `<tr>
+      <td style="width:40px;color:var(--text-muted);font-family:'Space Mono',monospace;font-size:11px">${String(i+1).padStart(2,'0')}</td>
+      <td class="topic-name">${t}</td>
+      <td style="width:150px">
+        <div class="status-badge" style="background:${st.bg};color:${st.color}">
+          <select class="status-select" style="background:transparent;border:none;color:${st.color};width:135px"
+            onchange="setState('${disc.id}', ${i}, 'status', this.value); this.closest('tr').cells[2].querySelector('.status-badge').style.background = STATUS_CONFIG.find(x=>x.key===this.value).bg; this.closest('tr').cells[2].querySelector('.status-badge').style.color = STATUS_CONFIG.find(x=>x.key===this.value).color; renderTabs();">
+            ${STATUS_CONFIG.map(sc => `<option value="${sc.key}" ${s.status === sc.key ? 'selected' : ''} style="background:#1e2435;color:${sc.color}">${sc.label}</option>`).join("")}
+          </select>
+        </div>
+      </td>
+      <td style="width:200px">
+        <input class="note-input" type="text" placeholder="Anotação..."
+          value="${(s.note || '').replace(/"/g, '&quot;')}"
+          onchange="setState('${disc.id}', ${i}, 'note', this.value)"
+          onblur="setState('${disc.id}', ${i}, 'note', this.value)" />
+      </td>
+    </tr>`;
+  }).join("");
+
+  document.getElementById("content").innerHTML = `
+    <div class="disc-header" id="disc-header-${disc.id}">
+      <div class="disc-dot" style="background:${disc.color}"></div>
+      <div class="disc-title">${disc.name}</div>
+      <div class="disc-progress"><div class="disc-progress-fill" style="background:${disc.color};width:${pct}%"></div></div>
+      <span class="priority-tag" style="background:${disc.pBg};color:${disc.pColor}">${disc.priority}</span>
+      <div class="disc-meta">${done}/${disc.topics.length} tópicos · ${disc.questions}q · ${disc.points}pts</div>
+    </div>
+    ${filteredTopics.length === 0 
+      ? '<div class="empty">Nenhum tópico com esse status nessa disciplina.</div>'
+      : `<table class="topics-table">
+          <thead><tr>
+            <th>#</th>
+            <th>Tópico</th>
+            <th>Status</th>
+            <th>Anotações</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>`
+    }
+  `;
+}
+
+async function init() {
+  await loadState();
+  renderStats();
+  renderTabs();
+  renderContent();
+}
+
+init();
+</script>
+</body>
+</html>
