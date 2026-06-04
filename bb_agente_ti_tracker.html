@@ -866,6 +866,8 @@ function setState(discId, idx, field, val) {
   state[k][field] = val;
   scheduleSave();
   renderStats();
+  renderTabs();
+  renderContent();
   renderDiscHeader(discId);
 }
 
@@ -1061,6 +1063,13 @@ onAuthStateChanged(auth, async (user) => {
   renderTabs();
   renderContent();
   updateSaveIndicator(remoteEnabled && currentUser ? "Dados sincronizados com Firebase" : "Modo local ativo");
+});
+
+Object.assign(window, {
+  setTab,
+  setStatusFilter,
+  setState,
+  STATUS_CONFIG
 });
 
 init();
