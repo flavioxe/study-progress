@@ -376,6 +376,52 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
+  .toast-container {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1000;
+    max-width: 90vw;
+  }
+
+  .toast {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+    max-width: 300px;
+    animation: toast-in 0.2s ease, toast-out 0.3s ease 2.6s forwards;
+  }
+
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+
+  @keyframes toast-in {
+    from { transform: translateX(24px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes toast-out {
+    to { transform: translateX(24px); opacity: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .toast-container {
+      left: 12px;
+      right: 12px;
+      top: 12px;
+    }
+
+    .toast {
+      max-width: none;
+    }
+  }
+
   .auth-form {
     display: flex;
     gap: 10px;
@@ -848,11 +894,14 @@ const STATUS_CONFIG = [
 let state = {}; // { "ti:0": {status: "0", note: ""}, ... }
 let activeTab = "ti";
 let statusFilter = "all";
-let saveTimeout = null;
+const saveTimeouts = {};
 const STORAGE_KEY = "bb_tracker_v2";
 let currentUser = null;
 let authReady = false;
 let remoteEnabled = false;
+let loadedDisciplines = new Set();
+let legacyChecked = false;
+let legacyByDisc = null;
 
 function getLocalStateValue(keyName) {
   try {
@@ -870,55 +919,105 @@ function setLocalStateValue(keyName, value) {
   }
 }
 
-function hasStoredProgress(rawValue) {
-  if (!rawValue) return false;
+function localKey(discId) { return `${STORAGE_KEY}:${discId}`; }
+
+function ensureToastContainer() {
+  let c = document.getElementById("toast-container");
+  if (!c) {
+    c = document.createElement("div");
+    c.id = "toast-container";
+    c.className = "toast-container";
+    document.body.appendChild(c);
+  }
+  return c;
+}
+
+const toast = {
+  show(message, type) {
+    const c = ensureToastContainer();
+    const el = document.createElement("div");
+    el.className = `toast ${type}`;
+    el.textContent = message;
+    c.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  },
+  success(message) { this.show(message, "success"); },
+  error(message) { this.show(message, "error"); }
+};
+
+// Doc antigo (studyProgress/{uid}) guardava tudo em um blob único; lido
+// uma única vez por sessão e fatiado por matéria sob demanda.
+async function migrateLegacyIfNeeded() {
+  if (legacyChecked) return;
+  legacyChecked = true;
+  if (!remoteEnabled || !currentUser) return;
   try {
-    const parsed = JSON.parse(rawValue);
-    return Boolean(parsed && Object.keys(parsed).length);
+    const snap = await getDoc(doc(db, "studyProgress", currentUser.uid));
+    if (snap.exists() && snap.data().state) {
+      legacyByDisc = {};
+      Object.entries(snap.data().state).forEach(([k, v]) => {
+        const sep = k.indexOf(":");
+        const discId = k.slice(0, sep);
+        const idx = k.slice(sep + 1);
+        if (!legacyByDisc[discId]) legacyByDisc[discId] = {};
+        legacyByDisc[discId][idx] = v;
+      });
+    }
   } catch (error) {
-    return false;
+    // Migração é best-effort; segue sem dados legados se falhar.
   }
 }
 
-const storageAdapter = {
-  async get(keyName) {
-    const localValue = getLocalStateValue(keyName);
+async function loadDisciplineState(discId) {
+  if (loadedDisciplines.has(discId)) return;
 
-    if (remoteEnabled && currentUser) {
-      const snapshot = await getDoc(doc(db, "studyProgress", currentUser.uid));
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        const remoteValue = JSON.stringify(data.state || {});
-        setLocalStateValue(keyName, remoteValue);
-        return { value: remoteValue, source: "remote" };
-      }
+  let merged = {};
+  const localRaw = getLocalStateValue(localKey(discId));
+  try { merged = localRaw ? JSON.parse(localRaw) : {}; } catch (error) { merged = {}; }
 
-      if (hasStoredProgress(localValue)) {
-        await setDoc(doc(db, "studyProgress", currentUser.uid), {
-          state: JSON.parse(localValue),
-          updatedAt: new Date().toISOString(),
-          email: currentUser.email || null
-        }, { merge: true });
-        return { value: localValue, source: "local-migrated" };
-      }
-    }
-
-    return { value: localValue, source: "local" };
-  },
-  async set(keyName, value) {
-    setLocalStateValue(keyName, value);
-
-    if (remoteEnabled && currentUser) {
-      await setDoc(doc(db, "studyProgress", currentUser.uid), {
-        state: JSON.parse(value),
+  if (remoteEnabled && currentUser) {
+    const snap = await getDoc(doc(db, "studyProgress", currentUser.uid, "disciplines", discId));
+    if (snap.exists()) {
+      merged = snap.data().state || {};
+      setLocalStateValue(localKey(discId), JSON.stringify(merged));
+    } else if (Object.keys(merged).length) {
+      await setDoc(doc(db, "studyProgress", currentUser.uid, "disciplines", discId), {
+        state: merged,
         updatedAt: new Date().toISOString(),
         email: currentUser.email || null
       }, { merge: true });
+    } else {
+      await migrateLegacyIfNeeded();
+      if (legacyByDisc && legacyByDisc[discId]) {
+        merged = legacyByDisc[discId];
+        setLocalStateValue(localKey(discId), JSON.stringify(merged));
+        await setDoc(doc(db, "studyProgress", currentUser.uid, "disciplines", discId), {
+          state: merged,
+          updatedAt: new Date().toISOString(),
+          email: currentUser.email || null
+        }, { merge: true });
+      }
     }
-
-    return true;
   }
-};
+
+  Object.entries(merged).forEach(([idx, value]) => { state[key(discId, idx)] = value; });
+  loadedDisciplines.add(discId);
+}
+
+async function saveDisciplineState(discId) {
+  const disc = DISCIPLINES.find(d => d.id === discId);
+  const data = {};
+  disc.topics.forEach((_, i) => { data[i] = getState(discId, i); });
+  setLocalStateValue(localKey(discId), JSON.stringify(data));
+
+  if (remoteEnabled && currentUser) {
+    await setDoc(doc(db, "studyProgress", currentUser.uid, "disciplines", discId), {
+      state: data,
+      updatedAt: new Date().toISOString(),
+      email: currentUser.email || null
+    }, { merge: true });
+  }
+}
 
 function updateSaveIndicator(message, isSaved = false) {
   const ind = document.getElementById("save-ind");
@@ -999,6 +1098,7 @@ function renderAuthBar() {
       updateSaveIndicator("Login realizado com sucesso", true);
     } catch (error) {
       updateSaveIndicator(`Falha no login: ${describeAuthError(error)}`);
+      toast.error(`Falha no login: ${describeAuthError(error)}`);
     }
   };
 
@@ -1009,6 +1109,7 @@ function renderAuthBar() {
       updateSaveIndicator("Acesso criado com sucesso", true);
     } catch (error) {
       updateSaveIndicator(`Falha ao criar acesso: ${describeAuthError(error)}`);
+      toast.error(`Falha ao criar acesso: ${describeAuthError(error)}`);
     }
   };
 }
@@ -1023,32 +1124,24 @@ function setState(discId, idx, field, val) {
   const k = key(discId, idx);
   if (!state[k]) state[k] = { status: "0", note: "" };
   state[k][field] = val;
-  scheduleSave();
+  scheduleSave(discId);
   renderStats();
   renderTabs();
   renderContent();
   renderDiscHeader(discId);
 }
 
-async function loadState() {
-  try {
-    const r = await storageAdapter.get(STORAGE_KEY);
-    state = r && r.value ? JSON.parse(r.value) : {};
-  } catch(e) {
-    state = {};
-    updateSaveIndicator(`Falha ao carregar dados: ${describeAuthError(e)}`);
-  }
-}
-
-function scheduleSave() {
-  clearTimeout(saveTimeout);
+function scheduleSave(discId) {
+  clearTimeout(saveTimeouts[discId]);
   updateSaveIndicator(remoteEnabled && currentUser ? "Sincronizando..." : "Salvando localmente...");
-  saveTimeout = setTimeout(async () => {
+  saveTimeouts[discId] = setTimeout(async () => {
     try {
-      await storageAdapter.set(STORAGE_KEY, JSON.stringify(state));
+      await saveDisciplineState(discId);
       updateSaveIndicator(remoteEnabled && currentUser ? "Dados sincronizados ✓" : "Dados salvos localmente ✓", true);
-    } catch(e) {
+      toast.success("Progresso salvo");
+    } catch (e) {
       updateSaveIndicator("Erro ao salvar");
+      toast.error(`Erro ao salvar: ${describeAuthError(e)}`);
     }
   }, 800);
 }
@@ -1134,9 +1227,19 @@ function renderTabs() {
   }).join("");
 }
 
-function setTab(id) {
+async function setTab(id) {
   activeTab = id;
   renderTabs();
+  if (!loadedDisciplines.has(id)) {
+    showLoader("Carregando matéria...");
+    try {
+      await loadDisciplineState(id);
+      renderStats();
+      renderTabs();
+    } catch (error) {
+      toast.error(`Erro ao carregar matéria: ${describeAuthError(error)}`);
+    }
+  }
   renderContent();
 }
 
@@ -1206,17 +1309,33 @@ function renderContent() {
   `;
 }
 
+function loadRemainingDisciplinesInBackground() {
+  const others = DISCIPLINES.map(d => d.id).filter(id => id !== activeTab);
+  (async () => {
+    for (const id of others) {
+      try {
+        await loadDisciplineState(id);
+        renderStats();
+        renderTabs();
+      } catch (error) {
+        toast.error(`Erro ao carregar ${id}: ${describeAuthError(error)}`);
+      }
+    }
+  })();
+}
+
 async function renderAll() {
   try {
     renderAuthBar();
-    showLoader("Carregando seus tópicos...");
-    await loadState();
+    showLoader("Carregando matéria...");
+    await loadDisciplineState(activeTab);
     renderStats();
     renderTabs();
     renderContent();
+    loadRemainingDisciplinesInBackground();
   } catch (error) {
-    state = state || {};
     updateSaveIndicator(`Falha ao carregar dados: ${describeAuthError(error)}`);
+    toast.error(`Falha ao carregar dados: ${describeAuthError(error)}`);
     renderStats();
     renderTabs();
     renderContent();
@@ -1228,6 +1347,7 @@ async function init() {
     await setPersistence(auth, browserLocalPersistence);
   } catch (error) {
     updateSaveIndicator(`Persistência de login indisponível: ${describeAuthError(error)}`);
+    toast.error(`Persistência de login indisponível: ${describeAuthError(error)}`);
   }
   await renderAll();
 }
@@ -1236,6 +1356,10 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   authReady = true;
   remoteEnabled = Boolean(user);
+  state = {};
+  loadedDisciplines = new Set();
+  legacyChecked = false;
+  legacyByDisc = null;
   await renderAll();
   updateSaveIndicator(remoteEnabled && currentUser ? "Dados sincronizados com Firebase" : "Modo local ativo");
 });
