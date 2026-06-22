@@ -1,39 +1,51 @@
 # Study Progress
 
-Tracker de estudos estático para acompanhamento do progresso do edital de Agente de TI.
+Tracker de estudos para acompanhamento do progresso no edital de Agente de TI (BB / CESGRANRIO).
 
-## Deploy na Vercel
+Aplicação React (Vite), com sincronização opcional via Firebase Auth + Firestore.
 
-Este projeto pode ser publicado na Vercel como um site estático simples.
+## Stack
 
-### Como funciona hoje
+- React 19 + React Router (SPA)
+- Vite (build e dev server)
+- Firebase Authentication + Firestore (sincronização entre dispositivos)
+- react-markdown + remark-gfm (renderização do guia de estudos)
 
-- A aplicação é servida como HTML estático.
-- O progresso é salvo no navegador do usuário via `localStorage`.
-- Os dados permanecem no mesmo navegador e no mesmo dispositivo.
-- Os dados não são sincronizados entre dispositivos.
-- Se o usuário limpar os dados do navegador, o progresso será perdido.
+## Como funciona
+
+- O progresso é salvo localmente (`localStorage`) por padrão.
+- Login opcional por email/senha sincroniza o progresso com o Firestore, por matéria — cada disciplina é carregada e salva de forma independente para manter o app leve.
+- Sem login, os dados ficam só no navegador/dispositivo atual.
+
+## Rotas
+
+- `/` → redireciona para o tracker.
+- `/bb_agente_ti_tracker.html` → tracker principal.
+- `/guia.html` → guia de estudos completo.
+
+## Desenvolvimento
+
+```bash
+npm install
+npm run dev
+```
+
+## Build / Deploy
+
+```bash
+npm run build
+```
+
+Gera o site estático em `dist/`. O `vercel.json` configura o rewrite de SPA (todas as rotas servidas por `index.html`, com roteamento feito no cliente).
 
 ## Estrutura
 
-- `bb_agente_ti_tracker.html`: aplicação principal.
-- `vercel.json`: configuração para servir o HTML na raiz do domínio.
-
-## Publicação
-
-1. Importe o repositório na Vercel.
-2. Não é necessário build command.
-3. O arquivo inicial será servido na rota `/`.
-
-## Quando usar banco de dados
-
-Você só precisa conectar a um banco se quiser:
-
-- sincronizar progresso entre dispositivos;
-- permitir login por usuário;
-- manter backup remoto dos dados;
-- compartilhar dados entre múltiplos usuários.
-
-## Próximo passo sugerido
-
-Se quiser persistência real na nuvem, a opção mais direta para este projeto é integrar com Supabase usando autenticação e uma tabela para salvar o estado do tracker.
+```
+src/
+  components/   componentes de UI reutilizáveis
+  pages/        TrackerPage e GuidePage
+  hooks/        useTrackerState (estado + Firebase), useToast
+  data/         disciplinas/tópicos e o markdown do guia
+  firebase/     configuração do Firebase
+  styles/       CSS (global, tracker, guia)
+```

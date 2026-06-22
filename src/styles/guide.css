@@ -1,0 +1,84 @@
+.guide-body {
+  background: radial-gradient(circle at top, rgba(79,142,247,0.12), transparent 30%), var(--bg);
+  line-height: 1.7;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.guide-shell {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.guide-topbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 16px 18px;
+  background: rgba(22,26,36,0.85);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  position: sticky;
+  top: 16px;
+  backdrop-filter: blur(10px);
+  z-index: 2;
+}
+
+.guide-title {
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 1px;
+  font-size: 13px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.guide-back {
+  color: white;
+  background: var(--accent);
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.guide-content {
+  background: rgba(22,26,36,0.8);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px;
+}
+
+.guide-content h1, .guide-content h2, .guide-content h3 {
+  line-height: 1.2;
+  margin-top: 1.5em;
+  margin-bottom: 0.6em;
+}
+
+.guide-content h1 { font-size: 2rem; }
+.guide-content h2 { font-size: 1.5rem; color: #dbeafe; }
+.guide-content h3 { font-size: 1.15rem; color: #bfdbfe; }
+.guide-content p, .guide-content li { color: var(--text); }
+.guide-content ul, .guide-content ol { padding-left: 22px; }
+.guide-content hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+.guide-content table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+.guide-content th, .guide-content td { border: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+.guide-content th { background: rgba(79,142,247,0.12); }
+.guide-content blockquote { margin: 18px 0; padding: 14px 16px; border-left: 4px solid var(--accent); background: rgba(79,142,247,0.08); color: #dbeafe; }
+.guide-content code { font-family: 'Space Mono', monospace; color: #93c5fd; }
+.guide-muted { color: var(--muted, #94a3b8); font-size: 13px; margin-top: 8px; }
+
+@media (max-width: 640px) {
+  .guide-body { padding: 12px; }
+  .guide-topbar { padding: 12px 14px; top: 8px; gap: 10px; }
+  .guide-back { padding: 8px 12px; font-size: 13px; }
+  .guide-content { padding: 16px; border-radius: 14px; }
+  .guide-content h1 { font-size: 1.5rem; }
+  .guide-content h2 { font-size: 1.25rem; }
+  .guide-content h3 { font-size: 1.05rem; }
+  .guide-content table { display: block; overflow-x: auto; white-space: nowrap; }
+  .guide-content th, .guide-content td { padding: 8px; }
+}
