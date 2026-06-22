@@ -92,6 +92,18 @@
     blockquote { margin: 18px 0; padding: 14px 16px; border-left: 4px solid var(--accent); background: rgba(79,142,247,0.08); color: #dbeafe; }
     code { font-family: 'Space Mono', monospace; color: #93c5fd; }
     .muted { color: var(--muted); font-size: 13px; margin-top: 8px; }
+
+    @media (max-width: 640px) {
+      body { padding: 12px; }
+      .topbar { padding: 12px 14px; top: 8px; gap: 10px; }
+      .back { padding: 8px 12px; font-size: 13px; }
+      .content { padding: 16px; border-radius: 14px; }
+      h1 { font-size: 1.5rem; }
+      h2 { font-size: 1.25rem; }
+      h3 { font-size: 1.05rem; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+      th, td { padding: 8px; }
+    }
   </style>
 </head>
 <body>

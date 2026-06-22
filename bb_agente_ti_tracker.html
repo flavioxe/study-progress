@@ -406,15 +406,28 @@
 
   @media (max-width: 640px) {
     body {
-      padding: 12px;
+      padding: 10px;
     }
 
     h1 {
       font-size: 20px;
     }
 
+    .logo-row {
+      flex-wrap: wrap;
+    }
+
     .stats-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .stat-card {
+      padding: 10px 8px;
+    }
+
+    .stat-num {
+      font-size: 19px;
     }
 
     .tab {
@@ -435,6 +448,85 @@
 
     .filter-row {
       gap: 6px;
+    }
+
+    .filter-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .disc-header {
+      padding: 10px 12px;
+    }
+
+    .disc-meta {
+      font-size: 10px;
+    }
+
+    /* Tabela vira lista de cards empilhados no mobile, sem scroll horizontal */
+    .table-wrap {
+      overflow-x: visible;
+    }
+
+    .topics-table {
+      min-width: 0;
+    }
+
+    .topics-table thead {
+      display: none;
+    }
+
+    .topics-table, .topics-table tbody, .topics-table tr, .topics-table td {
+      display: block;
+      width: 100%;
+    }
+
+    .topics-table tr {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      padding: 10px 12px;
+    }
+
+    .topics-table tr:nth-child(even) td { background: transparent; }
+
+    .topics-table td {
+      border-bottom: none;
+      padding: 6px 0;
+    }
+
+    .topics-table td[data-label]::before {
+      content: attr(data-label);
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .topics-table td:first-child {
+      display: none;
+    }
+
+    .status-select {
+      width: 100%;
+    }
+
+    .status-badge {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .status-select[style] {
+      width: 100% !important;
+    }
+
+    .note-input {
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      padding: 8px 10px;
     }
   }
 </style>
@@ -1042,10 +1134,10 @@ function renderContent() {
     const st = STATUS_CONFIG.find(x => x.key === s.status) || STATUS_CONFIG[0];
     return `<tr>
       <td style="width:40px;color:var(--text-muted);font-family:'Space Mono',monospace;font-size:11px">${String(i+1).padStart(2,'0')}</td>
-      <td class="topic-name">${typeof t === "object"
+      <td class="topic-name" data-label="Tópico">${typeof t === "object"
         ? `<div>${t.name}</div><div style="font-size:11px;color:var(--text-muted);margin-top:3px;line-height:1.5">${t.description}</div>`
         : t}</td>
-      <td style="width:150px">
+      <td style="width:150px" data-label="Status">
         <div class="status-badge" style="background:${st.bg};color:${st.color}">
           <select class="status-select" style="background:transparent;border:none;color:${st.color};width:135px"
             onchange="setState('${disc.id}', ${i}, 'status', this.value); this.closest('tr').cells[2].querySelector('.status-badge').style.background = STATUS_CONFIG.find(x=>x.key===this.value).bg; this.closest('tr').cells[2].querySelector('.status-badge').style.color = STATUS_CONFIG.find(x=>x.key===this.value).color; renderTabs();">
@@ -1053,7 +1145,7 @@ function renderContent() {
           </select>
         </div>
       </td>
-      <td style="width:200px">
+      <td style="width:200px" data-label="Anotações">
         <input class="note-input" type="text" placeholder="Anotação..."
           value="${(s.note || '').replace(/"/g, '&quot;')}"
           onchange="setState('${disc.id}', ${i}, 'note', this.value)"
