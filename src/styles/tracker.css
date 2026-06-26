@@ -343,6 +343,30 @@ h1 span { color: var(--accent); }
   font-size: 13px;
   line-height: 1.6;
   color: var(--text);
+  text-align: left;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.modal-content * {
+  text-align: left;
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 .modal-content h1, .modal-content h2, .modal-content h3 {
