@@ -1,8 +1,15 @@
+import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { STATUS_CONFIG } from "../data/disciplines.js";
+import { getBizu } from "../data/bizu/index.js";
+import { Modal } from "./Modal.jsx";
 
 export function TopicRow({ index, topic, discId, topicState, onStateChange }) {
   const status = STATUS_CONFIG.find((s) => s.key === topicState.status) || STATUS_CONFIG[0];
   const isObject = typeof topic === "object";
+  const bizu = getBizu(topic);
+  const [showBizu, setShowBizu] = useState(false);
 
   return (
     <tr>
@@ -32,6 +39,21 @@ export function TopicRow({ index, topic, discId, topicState, onStateChange }) {
             ))}
           </select>
         </div>
+      </td>
+      <td style={{ width: 60, textAlign: "center" }} data-label="Bizu">
+        <button
+          className="bizu-icon-btn"
+          disabled={!bizu}
+          title={bizu ? "Ver bizu" : "Bizu indisponível"}
+          onClick={() => bizu && setShowBizu(true)}
+        >
+          📄
+        </button>
+        {showBizu && bizu && (
+          <Modal title={isObject ? topic.name : "Bizu"} onClose={() => setShowBizu(false)}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{bizu}</ReactMarkdown>
+          </Modal>
+        )}
       </td>
       <td style={{ width: 200 }} data-label="Anotações">
         <input

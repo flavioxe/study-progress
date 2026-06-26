@@ -263,6 +263,117 @@ h1 span { color: var(--accent); }
 
 .note-input::placeholder { color: var(--border); }
 
+.bizu-icon-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 15px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.bizu-icon-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--surface2);
+}
+
+.bizu-icon-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1100;
+}
+
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.modal-close:hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+.modal-content {
+  padding: 18px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.modal-content h1, .modal-content h2, .modal-content h3 {
+  margin: 16px 0 8px;
+  color: var(--text);
+}
+
+.modal-content h1:first-child, .modal-content h2:first-child {
+  margin-top: 0;
+}
+
+.modal-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.modal-content th, .modal-content td {
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.modal-content code {
+  background: var(--surface2);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
 .priority-tag {
   font-size: 9px;
   padding: 2px 6px;
@@ -538,6 +649,10 @@ h1 span { color: var(--accent); }
     border: 1px solid var(--border);
     background: var(--surface2);
     padding: 8px 10px;
+  }
+
+  .modal-box {
+    max-height: 90vh;
   }
 
   .toast-container {

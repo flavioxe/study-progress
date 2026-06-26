@@ -17,6 +17,7 @@ export function TopicsTable({ disc, statusFilter, getState, onStateChange }) {
             <th>#</th>
             <th>Tópico</th>
             <th>Status</th>
+            <th>Bizu</th>
             <th>Anotações</th>
           </tr>
         </thead>
