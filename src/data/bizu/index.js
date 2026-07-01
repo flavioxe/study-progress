@@ -2,6 +2,7 @@ import ordenacaoBubbleSelectionInsertion from "./estrutura-de-dados/ordenacao-bu
 import buscaSequencialBinaria from "./estrutura-de-dados/busca-sequencial-binaria.md?raw";
 import listaEncadeada from "./estrutura-de-dados/lista-encadeada.md?raw";
 import fila from "./estrutura-de-dados/fila.md?raw";
+import pilha from "./estrutura-de-dados/pilha.md?raw";
 
 // Maps a topic name (exact match against disciplines.js) to its bizu markdown content.
 // Add new entries here as more bizu files are written; topics with no entry show a disabled icon.
@@ -12,6 +13,7 @@ export const BIZU_MAP = {
   "Estrutura de Dados: Ordenação Insertion Sort": ordenacaoBubbleSelectionInsertion,
   "Estrutura de Dados: Lista encadeada": listaEncadeada,
   "Estrutura de Dados: Fila (FIFO)": fila,
+  "Estrutura de Dados: Pilha (LIFO)": pilha,
 };
 
 export function getBizu(topic) {
