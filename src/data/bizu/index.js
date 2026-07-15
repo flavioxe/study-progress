@@ -27,6 +27,7 @@ export const BIZU_MAP = {
 };
 
 export function getBizu(topic) {
-  if (!topic || typeof topic !== "object") return null;
-  return BIZU_MAP[topic.name] || null;
+  if (!topic) return null;
+  const name = typeof topic === "object" ? topic.name : topic;
+  return BIZU_MAP[name] || null;
 }
